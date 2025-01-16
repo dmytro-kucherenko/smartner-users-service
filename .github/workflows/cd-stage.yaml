@@ -6,18 +6,7 @@ on:
       - 'stage'
 
 jobs:
-  Config:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Set up actions
-        uses: actions/checkout@v4
-
-      # Run env validation: make config
-
-  Deploy:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Set up actions
-        uses: actions/checkout@v4
-
-      # Build and deploy lambda
+  call-template:
+    uses: ./.github/workflows/cd-template.yml
+    with:
+      environment: stage

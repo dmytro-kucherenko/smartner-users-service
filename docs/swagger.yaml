@@ -1,0 +1,282 @@
+basePath: /api/v1
+definitions:
+  ErrorDto:
+    properties:
+      details:
+        items:
+          type: string
+        type: array
+      message:
+        type: string
+      status:
+        type: integer
+    type: object
+  PaginationMetaDto:
+    properties:
+      next:
+        type: integer
+      page:
+        type: integer
+      prev:
+        type: integer
+      size:
+        type: integer
+      total:
+        type: integer
+    type: object
+  UserItemDto:
+    properties:
+      firstname:
+        type: string
+      id:
+        type: string
+      secondname:
+        type: string
+    type: object
+  UserSignInBodyDto:
+    properties:
+      email:
+        type: string
+      password:
+        type: string
+    required:
+    - email
+    - password
+    type: object
+  UserSignUpBodyDto:
+    properties:
+      email:
+        type: string
+      firstname:
+        type: string
+      lastname:
+        type: string
+      password:
+        type: string
+    required:
+    - email
+    - firstname
+    - lastname
+    - password
+    type: object
+  UserUpdateBodyDto:
+    properties:
+      firstname:
+        type: string
+      lastname:
+        type: string
+    type: object
+  UsersPageDto:
+    properties:
+      items:
+        items:
+          $ref: '#/definitions/UserItemDto'
+        type: array
+      meta:
+        $ref: '#/definitions/PaginationMetaDto'
+    type: object
+host: localhost:8000
+info:
+  contact: {}
+  description: This is a users service example.
+  license:
+    name: Apache 2.0
+    url: http://www.apache.org/licenses/LICENSE-2.0.html
+  title: Users API
+  version: "1.0"
+paths:
+  /users/delete/:id:
+    delete:
+      consumes:
+      - application/json
+      parameters:
+      - in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/UserItemDto'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/ErrorDto'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/ErrorDto'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/ErrorDto'
+      security:
+      - JWTAuth: []
+      summary: Delete user
+      tags:
+      - Users
+  /users/get/:id:
+    get:
+      consumes:
+      - application/json
+      parameters:
+      - in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/UserItemDto'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/ErrorDto'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/ErrorDto'
+      summary: Get user
+      tags:
+      - Users
+  /users/page:
+    get:
+      consumes:
+      - application/json
+      parameters:
+      - in: query
+        minimum: 1
+        name: page
+        type: integer
+      - in: query
+        minimum: 1
+        name: size
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/UsersPageDto'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/ErrorDto'
+      summary: Get users page
+      tags:
+      - Users
+  /users/signIn:
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: User Data
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/UserSignInBodyDto'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/UserItemDto'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/ErrorDto'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/ErrorDto'
+        "409":
+          description: Conflict
+          schema:
+            $ref: '#/definitions/ErrorDto'
+      summary: Sign in user
+      tags:
+      - Users
+  /users/signUp:
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: User Data
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/UserSignUpBodyDto'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/UserItemDto'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/ErrorDto'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/ErrorDto'
+        "409":
+          description: Conflict
+          schema:
+            $ref: '#/definitions/ErrorDto'
+      summary: Sign up user
+      tags:
+      - Users
+  /users/update/:id:
+    put:
+      consumes:
+      - application/json
+      parameters:
+      - description: User Data
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/UserUpdateBodyDto'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/UserItemDto'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/ErrorDto'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/ErrorDto'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/ErrorDto'
+      security:
+      - JWTAuth: []
+      summary: Update user
+      tags:
+      - Users
+securityDefinitions:
+  JWTAuth:
+    description: Bearer JWT authorization guard
+    in: header
+    name: Authorization
+    type: apiKey
+swagger: "2.0"

@@ -7,6 +7,6 @@ on:
 
 jobs:
   call-template:
-    uses: ./.github/workflows/cd-template.yml
+    uses: ./.github/workflows/cd-template.yaml
     with:
       environment: stage

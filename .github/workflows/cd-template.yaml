@@ -8,24 +8,19 @@ on:
         type: string
 
 jobs:
-  test:
-    runs-on: ubuntu-latest
-    environment: ${{ inputs.environment }}
-    steps:
-      - name: Echo
-        run: |
-          echo ${{ vars.TEST }}
-
   config:
     runs-on: ubuntu-latest
+    environment: ${{ inputs.environment }}
     steps:
       - name: Set up actions
         uses: actions/checkout@v4
 
       # Run env validation: make config
+      # Usage during run: ${{ vars.TEST }}
 
   deploy:
     runs-on: ubuntu-latest
+    environment: ${{ inputs.environment }}
     steps:
       - name: Set up actions
         uses: actions/checkout@v4

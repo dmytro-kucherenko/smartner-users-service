@@ -6,7 +6,7 @@ on:
       - '**'
 
 jobs:
-  Linting:
+  linting:
     runs-on: ubuntu-latest
     steps:
       - name: Set up actions

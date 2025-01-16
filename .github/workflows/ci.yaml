@@ -1,0 +1,31 @@
+name: Pull Request Actions
+
+on:
+  pull_request:
+    branches:
+      - '**'
+
+jobs:
+  Linting:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Set up actions
+        uses: actions/checkout@v4
+
+      - name: Set up SDK
+        uses: actions/setup-go@v5
+        with:
+          go-version-file: 'go.mod'
+          cache-dependency-path: 'go.sum'
+
+      - name: Download packages
+        run: go mod download
+
+      - name: Check types
+        run: make lint
+
+      - name: Check packages
+        run: go mod tidy && git diff --exit-code go.mod go.sum
+
+      - name: Build module
+        run: make build

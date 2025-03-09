@@ -3,15 +3,20 @@ module github.com/Dmytro-Kucherenko/smartner-users-service
 go 1.23.2
 
 require (
-	github.com/dmytro-kucherenko/smartner-utils-package v0.1.1
+	github.com/dmytro-kucherenko/smartner-utils-package v0.1.14
 	github.com/gin-gonic/gin v1.10.0
 	github.com/google/uuid v1.6.0
 )
 
-require github.com/joho/godotenv v1.5.1 // indirect
-
 require (
 	github.com/KyleBanks/depth v1.2.1 // indirect
+	github.com/aws/aws-lambda-go v1.47.0 // indirect
+	github.com/awslabs/aws-lambda-go-api-proxy v0.16.2 // indirect
+	github.com/joho/godotenv v1.5.1 // indirect
+	github.com/mitchellh/mapstructure v1.5.0 // indirect
+)
+
+require (
 	github.com/bytedance/sonic v1.12.7 // indirect
 	github.com/bytedance/sonic/loader v0.2.3 // indirect
 	github.com/cloudwego/base64x v0.1.4 // indirect

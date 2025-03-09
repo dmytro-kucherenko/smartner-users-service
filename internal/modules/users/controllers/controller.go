@@ -16,18 +16,19 @@ func New(service *services.Main) *Main {
 	return &Main{service}
 }
 
-func (controller *Main) Init(router *gin.RouterGroup) {
-	group := router.Group("users")
-	adapter.Get(group, adapter.Config("/get/:id", 200, nil), controller.get)
-	adapter.Get(group, adapter.Config("/page", 200, nil), controller.getPage)
-	adapter.Post(group, adapter.Config("/signIn", 200, nil), controller.signIn)
-	adapter.Post(group, adapter.Config("/signUp", 201, nil), controller.signUp)
-	adapter.Put(group, adapter.Config("/update/:id", 200, nil), controller.update)
-	adapter.Delete(group, adapter.Config("/delete/:id", 200, nil), controller.delete)
+func (controller *Main) Init(group *gin.RouterGroup, meta server.RequestMeta) {
+	config := adapter.NewConfig(meta).WithSession()
+	adapter.Get(group, controller.get, config.MapRoute("/get/:id", 200))
+	adapter.Get(group, controller.getPage, config.MapRoute("/page", 200))
+	adapter.Post(group, controller.signIn, config.MapRoute("/signIn", 200))
+	adapter.Post(group, controller.signUp, config.MapRoute("/signUp", 201))
+	adapter.Put(group, controller.update, config.MapRoute("/update/:id", 200))
+	adapter.Delete(group, controller.delete, config.MapRoute("/delete/:id", 200))
 }
 
 // @Summary	Get user
 // @Tags		Users
+// @Security JWTAuth
 // @Accept		json
 // @Produce	json
 // @Param		path	path		UserGetParamsDto	true	"User Filters"
@@ -41,6 +42,7 @@ func (controller *Main) get(options *server.RequestOptions[any, dtos.GetRequest,
 
 // @Summary	Get users page
 // @Tags		Users
+// @Security JWTAuth
 // @Accept		json
 // @Produce	json
 // @Param		name	query		UsersGetAllQueryDto	true	"Page Filters"
@@ -67,6 +69,7 @@ func (controller *Main) signIn(options *server.RequestOptions[dtos.SignInRequest
 
 // @Summary	Sign up user
 // @Tags		Users
+// @Security JWTAuth
 // @Accept		json
 // @Produce	json
 // @Param		body	body		UserSignUpBodyDto	true	"User Data"

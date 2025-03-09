@@ -1,19 +1,50 @@
 package config
 
+import (
+	"fmt"
+	"strings"
+)
+
+const PortDefault uint16 = 8000
+
 func IsProd() bool {
 	return schema.AppEnv == "prod"
 }
 
 func IsLocal() bool {
-	return schema.AppEnv == "local"
+	return schema.AppEnv == "local" || schema.AppEnv == "stage"
 }
 
 func AppEnv() string {
 	return schema.AppEnv
 }
 
-func AppPort() int {
+func AppPort() uint16 {
+	if schema.AppPort == 0 {
+		return PortDefault
+	}
+
 	return schema.AppPort
+}
+
+func AppProtocol() string {
+	return schema.AppProtocol
+}
+
+func AppHost() string {
+	return schema.AppHost
+}
+
+func AppBasePath() string {
+	if schema.AppBasePath != "" && !strings.HasPrefix(schema.AppBasePath, "/") {
+		return "/" + schema.AppBasePath
+	}
+
+	return schema.AppBasePath
+}
+
+func AppURL() string {
+	return fmt.Sprintf("%v://%v%v", AppProtocol(), AppHost(), AppBasePath())
 }
 
 func ClientURL() string {
@@ -24,7 +55,7 @@ func DBHost() string {
 	return schema.DBHost
 }
 
-func DBPort() int {
+func DBPort() uint16 {
 	return schema.AppPort
 }
 
@@ -41,7 +72,15 @@ func DBPassword() string {
 }
 
 func DBConnection() string {
-	return schema.DBConnection
+	return fmt.Sprintf(
+		"postgres://%v:%v@%v:%v/%v?search_path=%v",
+		schema.DBUsername,
+		schema.DBPassword,
+		schema.DBHost,
+		schema.DBPort,
+		schema.DBName,
+		schema.DBSchema,
+	)
 }
 
 func PasswordSecret() string {

@@ -34,7 +34,7 @@ func (controller *Main) Init(group *gin.RouterGroup, meta server.RequestMeta) {
 // @Param		path	path		UserGetParamsDto	true	"User Filters"
 // @Success	200		{object}	UserItemDto
 // @Failure	400		{object}	ErrorDto
-// @Failure	404		{object}	ErrorDto
+// @Failure	404		{object}	ErroraDto
 // @Router		/users/get/:id [get]
 func (controller *Main) get(options *server.RequestOptions[any, dtos.GetRequest, any]) (dtos.ItemResponse, error) {
 	return controller.service.Get(options.Ctx, options.Params)

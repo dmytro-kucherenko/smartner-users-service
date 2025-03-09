@@ -32,3 +32,9 @@ jobs:
 
       - name: Build module
         run: make build
+
+  # TODO: Remove when ready
+  test:
+    uses: ./.github/workflows/cd-template.yaml
+    with:
+      environment: stage

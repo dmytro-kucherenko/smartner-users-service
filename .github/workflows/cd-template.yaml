@@ -15,6 +15,9 @@ jobs:
       - name: Set up actions
         uses: actions/checkout@v4
 
+      - name: Test environment
+        run: ${{ vars.TEST }}
+
       # Run env validation: make config
       # Usage during run: ${{ vars.TEST }}
 

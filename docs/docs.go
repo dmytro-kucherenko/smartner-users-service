@@ -74,6 +74,11 @@ const docTemplate = `{
         },
         "/users/get/:id": {
             "get": {
+                "security": [
+                    {
+                        "JWTAuth": []
+                    }
+                ],
                 "consumes": [
                     "application/json"
                 ],
@@ -116,6 +121,11 @@ const docTemplate = `{
         },
         "/users/page": {
             "get": {
+                "security": [
+                    {
+                        "JWTAuth": []
+                    }
+                ],
                 "consumes": [
                     "application/json"
                 ],
@@ -209,6 +219,11 @@ const docTemplate = `{
         },
         "/users/signUp": {
             "post": {
+                "security": [
+                    {
+                        "JWTAuth": []
+                    }
+                ],
                 "consumes": [
                     "application/json"
                 ],
@@ -356,13 +371,13 @@ const docTemplate = `{
         "UserItemDto": {
             "type": "object",
             "properties": {
-                "firstname": {
+                "firstName": {
                     "type": "string"
                 },
                 "id": {
                     "type": "string"
                 },
-                "secondname": {
+                "lastName": {
                     "type": "string"
                 }
             }
@@ -386,18 +401,18 @@ const docTemplate = `{
             "type": "object",
             "required": [
                 "email",
-                "firstname",
-                "lastname",
+                "firstName",
+                "lastName",
                 "password"
             ],
             "properties": {
                 "email": {
                     "type": "string"
                 },
-                "firstname": {
+                "firstName": {
                     "type": "string"
                 },
-                "lastname": {
+                "lastName": {
                     "type": "string"
                 },
                 "password": {
@@ -408,10 +423,10 @@ const docTemplate = `{
         "UserUpdateBodyDto": {
             "type": "object",
             "properties": {
-                "firstname": {
+                "firstName": {
                     "type": "string"
                 },
-                "lastname": {
+                "lastName": {
                     "type": "string"
                 }
             }
@@ -433,7 +448,7 @@ const docTemplate = `{
     },
     "securityDefinitions": {
         "JWTAuth": {
-            "description": "Bearer JWT authorization guard",
+            "description": "JWT authorization guard",
             "type": "apiKey",
             "name": "Authorization",
             "in": "header"
@@ -443,12 +458,12 @@ const docTemplate = `{
 
 // SwaggerInfo holds exported Swagger Info so clients can modify it
 var SwaggerInfo = &swag.Spec{
-	Version:          "1.0",
-	Host:             "localhost:8000",
-	BasePath:         "/api/v1",
+	Version:          "",
+	Host:             "",
+	BasePath:         "",
 	Schemes:          []string{},
-	Title:            "Users API",
-	Description:      "This is a users service example.",
+	Title:            "",
+	Description:      "",
 	InfoInstanceName: "swagger",
 	SwaggerTemplate:  docTemplate,
 	LeftDelim:        "{{",

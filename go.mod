@@ -1,6 +1,6 @@
 module github.com/Dmytro-Kucherenko/smartner-users-service
 
-go 1.23.2
+go 1.24.1
 
 require (
 	github.com/dmytro-kucherenko/smartner-utils-package v0.1.14
@@ -12,8 +12,14 @@ require (
 	github.com/KyleBanks/depth v1.2.1 // indirect
 	github.com/aws/aws-lambda-go v1.47.0 // indirect
 	github.com/awslabs/aws-lambda-go-api-proxy v0.16.2 // indirect
+	github.com/cpuguy83/go-md2man/v2 v2.0.0-20190314233015-f79a8a8ca69d // indirect
 	github.com/joho/godotenv v1.5.1 // indirect
 	github.com/mitchellh/mapstructure v1.5.0 // indirect
+	github.com/rogpeppe/go-internal v1.12.0 // indirect
+	github.com/russross/blackfriday/v2 v2.1.0 // indirect
+	github.com/urfave/cli/v2 v2.3.0 // indirect
+	gopkg.in/yaml.v2 v2.4.0 // indirect
+	sigs.k8s.io/yaml v1.3.0 // indirect
 )
 
 require (
@@ -55,3 +61,5 @@ require (
 	google.golang.org/protobuf v1.36.3 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
 )
+
+tool github.com/swaggo/swag/cmd/swag

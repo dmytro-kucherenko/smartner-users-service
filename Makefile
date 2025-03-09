@@ -36,8 +36,8 @@ lint:
 docs:
 	@go mod vendor
 	@touch docs/swagger.json
-	@swag init -o docs -d cmd/local,internal,vendor/github.com/dmytro-kucherenko/smartner-utils-package
-	@swag fmt
+	@go tool github.com/swaggo/swag/cmd/swag init -o docs -d cmd/local,internal,vendor/github.com/dmytro-kucherenko/smartner-utils-package
+	@go tool github.com/swaggo/swag/cmd/swag fmt
 
 pre-commit:
 	@pre-commit autoupdate && pre-commit install
@@ -58,19 +58,19 @@ db-gen:
 	@sqlc generate
 
 migration-create:
-	@migrate create -ext sql -dir internal/db/migrations $(name)
+	@go run -tags 'postgres' github.com/golang-migrate/migrate/v4/cmd/migrate@latest create -ext sql -dir internal/db/migrations $(name)
 
 migration-up:
-	@migrate -path internal/db/migrations -database "postgres://${DB_USERNAME}:${DB_PASSWORD}@${DB_HOST}:${DB_PORT}/${DB_NAME}?search_path=${DB_SCHEMA}" up
+	@go run -tags 'postgres' github.com/golang-migrate/migrate/v4/cmd/migrate@latest -path internal/db/migrations -database "postgres://${DB_USERNAME}:${DB_PASSWORD}@${DB_HOST}:${DB_PORT}/${DB_NAME}?search_path=${DB_SCHEMA}" up
 
 migration-down:
-	@migrate -path internal/db/migrations -database "postgres://${DB_USERNAME}:${DB_PASSWORD}@${DB_HOST}:${DB_PORT}/${DB_NAME}?search_path=${DB_SCHEMA}" down 1
+	@go run -tags 'postgres' github.com/golang-migrate/migrate/v4/cmd/migrate@latest -path internal/db/migrations -database "postgres://${DB_USERNAME}:${DB_PASSWORD}@${DB_HOST}:${DB_PORT}/${DB_NAME}?search_path=${DB_SCHEMA}" down 1
 
 migration-reset:
-	@migrate -path internal/db/migrations -database "postgres://${DB_USERNAME}:${DB_PASSWORD}@${DB_HOST}:${DB_PORT}/${DB_NAME}?search_path=${DB_SCHEMA}" down
+	@go run -tags 'postgres' github.com/golang-migrate/migrate/v4/cmd/migrate@latest -path internal/db/migrations -database "postgres://${DB_USERNAME}:${DB_PASSWORD}@${DB_HOST}:${DB_PORT}/${DB_NAME}?search_path=${DB_SCHEMA}" down
 
 migration-version:
-	@migrate -path internal/db/migrations -database "postgres://${DB_USERNAME}:${DB_PASSWORD}@${DB_HOST}:${DB_PORT}/${DB_NAME}?search_path=${DB_SCHEMA}" version
+	@go run -tags 'postgres' github.com/golang-migrate/migrate/v4/cmd/migrate@latest -path internal/db/migrations -database "postgres://${DB_USERNAME}:${DB_PASSWORD}@${DB_HOST}:${DB_PORT}/${DB_NAME}?search_path=${DB_SCHEMA}" version
 
 deploy-service:
 	@sam build -t cfn/service.cfn.yaml

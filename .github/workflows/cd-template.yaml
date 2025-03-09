@@ -16,7 +16,7 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Test environment
-        run: ${{ vars.TEST }}
+        run: echo ${{ vars.TEST }}
 
       # Run env validation: make config
       # Usage during run: ${{ vars.TEST }}

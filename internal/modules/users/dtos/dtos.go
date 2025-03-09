@@ -6,7 +6,7 @@ import (
 )
 
 type GetRequest struct {
-	ID types.ID `uri:"id" binding:"required" swaggertype:"string"`
+	ID types.ID `uri:"id" binding:"required,uuid4" swaggertype:"string"`
 } // @name UserGetParamsDto
 
 type GetAllRequest struct {
@@ -14,26 +14,26 @@ type GetAllRequest struct {
 } // @name UsersGetAllQueryDto
 
 type SignInRequest struct {
-	Email    string `json:"email" binding:"required"`
+	Email    string `json:"email" binding:"required,email"`
 	Password string `json:"password" binding:"required"`
 } // @name UserSignInBodyDto
 
 type SignUpRequest struct {
-	FirstName string `json:"firstname" binding:"required"`
-	LastName  string `json:"lastname" binding:"required"`
-	Email     string `json:"email" binding:"required"`
+	FirstName string `json:"firstName" binding:"required"`
+	LastName  string `json:"lastName" binding:"required"`
+	Email     string `json:"email" binding:"required,email"`
 	Password  string `json:"password" binding:"required,password"`
 } // @name UserSignUpBodyDto
 
 type UpdateRequest struct {
-	FirstName *string `json:"firstname"`
-	LastName  *string `json:"lastname"`
+	FirstName *string `json:"firstName"`
+	LastName  *string `json:"lastName"`
 } // @name UserUpdateBodyDto
 
 type ItemResponse struct {
 	ID        types.ID `json:"id" swaggertype:"string"`
-	FirstName string   `json:"firstname"`
-	LastName  string   `json:"secondname"`
+	FirstName string   `json:"firstName"`
+	LastName  string   `json:"lastName"`
 } // @name UserItemDto
 
 type PageResponse struct {

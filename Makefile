@@ -3,23 +3,32 @@
 
 build:
 	@echo "Building..."
-	@go build -o bin/main cmd/api/main.go
+	@go build -o bin/main cmd/lambda/main.go
+
+build-local:
+	@echo "Building..."
+	@go build -o bin/local cmd/local/main.go
+
+build-UsersServiceFunction:
+	@GOOS=linux GOARCH=amd64 CGO_ENABLED=0 go build -o bin/bootstrap cmd/lambda/main.go
+	@cp ./bin/bootstrap $(ARTIFACTS_DIR)/.
 
 clean:
 	@echo "Cleaning"
 	@rm -f bin/main
+	@rm -f bin/local
 
 start:
-	@bin/main
+	@bin/local
 
 run:
-	@go run cmd/api/main.go
+	@go run cmd/local/main.go
 
 config:
 	@go run cmd/config/main.go
 
 watch:
-	@air
+	@air -c local.air.toml
 
 lint:
 	@go vet ./...
@@ -27,7 +36,7 @@ lint:
 docs:
 	@go mod vendor
 	@touch docs/swagger.json
-	@swag init -o docs -d cmd/api,internal,vendor/github.com/dmytro-kucherenko/smartner-utils-package
+	@swag init -o docs -d cmd/local,internal,vendor/github.com/dmytro-kucherenko/smartner-utils-package
 	@swag fmt
 
 pre-commit:
@@ -52,10 +61,17 @@ migration-create:
 	@migrate create -ext sql -dir internal/db/migrations $(name)
 
 migration-up:
-	@migrate -path internal/db/migrations -database "${DB_CONNECTION}" up
+	@migrate -path internal/db/migrations -database "postgres://${DB_USERNAME}:${DB_PASSWORD}@${DB_HOST}:${DB_PORT}/${DB_NAME}?search_path=${DB_SCHEMA}" up
 
 migration-down:
-	@migrate -path internal/db/migrations -database "${DB_CONNECTION}" down 1
+	@migrate -path internal/db/migrations -database "postgres://${DB_USERNAME}:${DB_PASSWORD}@${DB_HOST}:${DB_PORT}/${DB_NAME}?search_path=${DB_SCHEMA}" down 1
 
 migration-reset:
-	@migrate -path internal/db/migrations -database "${DB_CONNECTION}" down
+	@migrate -path internal/db/migrations -database "postgres://${DB_USERNAME}:${DB_PASSWORD}@${DB_HOST}:${DB_PORT}/${DB_NAME}?search_path=${DB_SCHEMA}" down
+
+migration-version:
+	@migrate -path internal/db/migrations -database "postgres://${DB_USERNAME}:${DB_PASSWORD}@${DB_HOST}:${DB_PORT}/${DB_NAME}?search_path=${DB_SCHEMA}" version
+
+deploy-service:
+	@sam build -t cfn/service.cfn.yaml
+	@sam deploy --config-file service.sam.toml

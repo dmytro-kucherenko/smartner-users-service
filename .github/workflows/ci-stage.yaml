@@ -5,6 +5,10 @@ on:
     branches:
       - '**'
 
+permissions:
+  id-token: write
+  contents: read
+
 jobs:
   stage:
     uses: ./.github/workflows/ci-template.yaml

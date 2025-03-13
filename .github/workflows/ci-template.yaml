@@ -7,12 +7,14 @@ on:
         required: true
         type: string
 
+permissions:
+  id-token: write
+  contents: read
+
 jobs:
   linting:
     runs-on: ubuntu-latest
     environment: ${{ inputs.environment }}
-    permissions:
-      contents: read
     steps:
       - name: Set up actions
         uses: actions/checkout@v4

@@ -28,7 +28,7 @@ Parameters:
     Default: aurora-postgresql
 
   DBInstanceClass:
-    Type: Stringa
+    Type: String
     Default: db.serverless
 
   DBMonitoringInterval:

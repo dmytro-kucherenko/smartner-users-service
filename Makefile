@@ -75,3 +75,6 @@ migration-version:
 deploy-service:
 	@sam build -t cfn/service.cfn.yaml
 	@sam deploy --config-file service.sam.toml
+
+lint-deploy:
+	@sam validate -t cfn/service.cfn.yaml --lint

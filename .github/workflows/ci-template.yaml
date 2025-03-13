@@ -36,9 +36,6 @@ jobs:
       - name: Build module
         run: make build
 
-      - name: Test environment
-        run: echo "${{ vars.AWS_REGION }} ${{ secrets.AWS_ACCESS_KEY_ID  }} ${{ secrets.AWS_SECRET_ACCESS_KEY }}"
-
       - name: Set up AWS credentials
         uses: aws-actions/configure-aws-credentials@v1
         with:
@@ -50,12 +47,15 @@ jobs:
         run: make lint-deploy
 
       - name: Build service stack and changeset
+        env:
+          AWS_REGION: ${{ vars.AWS_REGION }}
+          AWS_SERVICE_STACK_NAME: ${{ vars.AWS_SERVICE_STACK_NAME }}
         run: |
           sam build -t cfn/service.cfn.yaml
           sam deploy \
-            --stack-name smartner-users-service \
+            --stack-name $AWS_SERVICE_STACK_NAME \
             --resolve-s3 \
-            --s3-prefix smartner-users-service \
-            --region eu-central-1 \
+            --s3-prefix $AWS_SERVICE_STACK_NAME \
+            --region $AWS_REGION \
             --capabilities CAPABILITY_IAM \
             --no-execute-changeset

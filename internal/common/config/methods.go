@@ -47,6 +47,10 @@ func AppURL() string {
 	return fmt.Sprintf("%v://%v%v", AppProtocol(), AppHost(), AppBasePath())
 }
 
+func AppOnlyConfig() bool {
+	return schema.AppOnlyConfig
+}
+
 func ClientURL() string {
 	return schema.ClientURL
 }

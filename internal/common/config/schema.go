@@ -4,12 +4,19 @@ import (
 	helpers "github.com/dmytro-kucherenko/smartner-utils-package/pkg/config"
 )
 
+func GetEnvBool(key string) bool {
+	value := helpers.GetEnvInt(key)
+
+	return value != 0
+}
+
 type Schema struct {
 	AppEnv         string `validate:"required,oneof=local stage prod"`
 	AppPort        uint16
 	AppProtocol    string `validate:"required,oneof=http https"`
 	AppHost        string `validate:"required"`
 	AppBasePath    string
+	AppOnlyConfig  bool   `validate:"required"`
 	ClientURL      string `validate:"required"`
 	DBHost         string `validate:"required"`
 	DBPort         uint16 `validate:"required"`
@@ -31,6 +38,7 @@ func Load() (err error) {
 			AppProtocol:    helpers.GetEnvString("APP_PROTOCOL"),
 			AppHost:        helpers.GetEnvString("APP_HOST"),
 			AppBasePath:    helpers.GetEnvString("APP_BASE_PATH"),
+			AppOnlyConfig:  GetEnvBool("APP_ONLY_CONFIG"),
 			ClientURL:      helpers.GetEnvString("CLIENT_URL"),
 			DBHost:         helpers.GetEnvString("DB_HOST"),
 			DBPort:         uint16(helpers.GetEnvInt("DB_PORT")),

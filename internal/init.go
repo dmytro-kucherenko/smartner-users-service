@@ -1,6 +1,7 @@
 package internal
 
 import (
+	"net/http"
 	"time"
 
 	"github.com/Dmytro-Kucherenko/smartner-users-service/docs"
@@ -10,8 +11,20 @@ import (
 	validator "github.com/dmytro-kucherenko/smartner-utils-package/pkg/schema/adapters/playground"
 	"github.com/dmytro-kucherenko/smartner-utils-package/pkg/server"
 	adapter "github.com/dmytro-kucherenko/smartner-utils-package/pkg/server/adapters/gin"
+	"github.com/gin-gonic/gin"
 	"github.com/gin-gonic/gin/binding"
 )
+
+type StartupOptionsInternal struct {
+	Server          *http.Server
+	ShutdownTimeout time.Duration
+	OnlyConfig      bool
+}
+
+type StartupOptions struct {
+	StartupOptionsInternal
+	Router *gin.Engine
+}
 
 const (
 	ShutdownTimeout time.Duration = 10 * time.Second
@@ -31,17 +44,13 @@ func addDocs() {
 	docs.SwaggerInfo.Schemes = []string{protocol}
 }
 
-func Init(logger types.Logger, meta server.RequestMeta) (options adapter.StartupOptions, err error) {
+func Init(logger types.Logger, meta server.RequestMeta) (options StartupOptions, err error) {
 	err = config.Load()
 	if err != nil {
 		return
 	}
 
 	connection := config.DBConnection()
-	port := config.AppPort()
-	clientURL := config.ClientURL()
-	isProd := config.IsProd()
-
 	db, err := server.ConnectSQL(connection, DBTimeout)
 	if err != nil {
 		return
@@ -52,14 +61,30 @@ func Init(logger types.Logger, meta server.RequestMeta) (options adapter.Startup
 		return
 	}
 
+	onlyConfig := config.AppOnlyConfig()
+	if onlyConfig {
+		return StartupOptions{
+			Router: nil,
+			StartupOptionsInternal: StartupOptionsInternal{
+				Server:          nil,
+				ShutdownTimeout: ShutdownTimeout,
+				OnlyConfig:      onlyConfig,
+			},
+		}, nil
+	}
+
+	port := config.AppPort()
+	clientURL := config.ClientURL()
+	isProd := config.IsProd()
+
 	addDocs()
 	router, httpServer := adapter.CreateRouter(port, isProd, clientURL)
 	api := adapter.CreateRoutes(router, "/users", logger)
 	modules.Init(api, db, meta)
 
-	return adapter.StartupOptions{
+	return StartupOptions{
 		Router: router,
-		StartupOptions: server.StartupOptions{
+		StartupOptionsInternal: StartupOptionsInternal{
 			Server:          httpServer,
 			ShutdownTimeout: ShutdownTimeout,
 		},

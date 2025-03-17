@@ -64,7 +64,7 @@ jobs:
       - name: Invoke config
         env:
           AWS_CONFIG_FUNCTION_NAME: ${{ vars.AWS_CONFIG_FUNCTION_NAME }}
-        run: sam remove invoke $AWS_CONFIG_FUNCTION_NAME
+        run: sam remote invoke $AWS_CONFIG_FUNCTION_NAME
 
       - name: Build docs
         run: make docs

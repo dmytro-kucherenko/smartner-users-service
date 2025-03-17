@@ -76,5 +76,13 @@ deploy-service:
 	@sam build -t cfn/service.cfn.yaml
 	@sam deploy --config-file service.sam.toml
 
+deploy-config:
+	@sam build -t cfn/service.cfn.yaml
+	@sam deploy --config-file config.sam.toml --parameter-overrides FunctionName=UsersConfigFunction OnlyConfig=1
+
+deploy-db:
+	@sam build -t cfn/db.cfn.yaml
+	@sam deploy --config-file db.sam.toml
+
 lint-deploy:
 	@sam validate -t cfn/service.cfn.yaml --lint

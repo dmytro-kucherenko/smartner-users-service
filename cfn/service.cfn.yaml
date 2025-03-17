@@ -2,6 +2,17 @@ AWSTemplateFormatVersion: '2010-09-09'
 Transform: AWS::Serverless-2016-10-31
 
 Parameters:
+  FunctionName:
+    Type: String
+    Default: UsersServiceFunction
+
+  OnlyConfig:
+    Type: Number
+    AllowedValues:
+      - 0
+      - 1
+    Default: 0
+
   FunctionCodeURI:
     Type: String
     Default: ../.
@@ -23,32 +34,11 @@ Parameters:
     Type: String
     Default: users
 
-  DBEngine:
-    Type: String
-    Default: aurora-postgresql
-
-  DBInstanceClass:
-    Type: String
-    Default: db.serverless
-
-  DBMonitoringInterval:
-    Type: Number
-    MinValue: 0
-    Default: 0
-
 Resources:
-  UsersDBInstance:
-    Type: AWS::RDS::DBInstance
-    Properties:
-      Engine: !Ref DBEngine
-      DBInstanceClass: !Ref DBInstanceClass
-      DBClusterIdentifier: !ImportValue DBClusterID
-      MonitoringInterval: !Ref DBMonitoringInterval
-
   UsersServiceFunction:
     Type: AWS::Serverless::Function
     Properties:
-      FunctionName: UsersServiceFunction
+      FunctionName: !Ref FunctionName
       CodeUri: !Ref FunctionCodeURI
       Handler: !Ref FunctionHandler
       Runtime: !Ref FunctionRuntime
@@ -65,9 +55,10 @@ Resources:
           APP_PROTOCOL: https
           APP_HOST: !ImportValue ApiHost
           APP_BASE_PATH: !ImportValue ApiVersion
+          APP_ONLY_CONFIG: !Ref OnlyConfig
           CLIENT_URL: !Sub "{{resolve:ssm:/client/url}}"
-          DB_HOST: !GetAtt UsersDBInstance.Endpoint.Address
-          DB_PORT: !GetAtt UsersDBInstance.Endpoint.Port
+          DB_HOST: !ImportValue UsersDBInstanceHost
+          DB_PORT: !ImportValue UsersDBInstancePort
           DB_NAME: !Sub "{{resolve:secretsmanager:/db:SecretString:name:AWSCURRENT}}"
           DB_USERNAME: !Sub "{{resolve:secretsmanager:/db:SecretString:username:AWSCURRENT}}"
           DB_PASSWORD: !Sub "{{resolve:secretsmanager:/db:SecretString:password:AWSCURRENT}}"
@@ -80,4 +71,4 @@ Outputs:
     Description: "ARN of the Users Service Function"
     Value: !GetAtt UsersServiceFunction.Arn
     Export:
-      Name: UsersServiceFunctionArn
+      Name: !Sub "${FunctionName}Arn"

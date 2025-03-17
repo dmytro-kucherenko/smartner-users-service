@@ -31,18 +31,6 @@ jobs:
       - name: Download packages
         run: go mod download
 
-      - name: Test
-        env:
-          AWS_CONFIG_FUNCTION_NAME: ${{ vars.AWS_CONFIG_FUNCTION_NAME }}
-        run: |
-          response=$(sam remote invoke $AWS_CONFIG_FUNCTION_NAME --output text)
-          if [[ "$response" == *'"statusCode":500'* ]]; then
-            echo "Config invocation failed: $response"
-            exit 1
-          else
-            echo "Config invocation succeeded: $response"
-          fi
-
       - name: Deploy DB stack
         env:
           AWS_REGION: ${{ vars.AWS_REGION }}
@@ -76,10 +64,14 @@ jobs:
       - name: Invoke config
         env:
           AWS_CONFIG_FUNCTION_NAME: ${{ vars.AWS_CONFIG_FUNCTION_NAME }}
-        run: sam remote invoke $AWS_CONFIG_FUNCTION_NAME | grep -q "\"statusCode\":500" && exit 1
-        # run: |
-        #   response=$(sam remote invoke $AWS_CONFIG_FUNCTION_NAME)
-        #   echo "$response" | grep -q '"statusCode":500' && exit 1
+        run: |
+          response=$(sam remote invoke $AWS_CONFIG_FUNCTION_NAME --output text)
+          if [[ "$response" == *'"statusCode":500'* ]]; then
+            echo "Config invocation failed: $response"
+            exit 1
+          else
+            echo "Config invocation succeeded: $response"
+          fi
 
       - name: Build docs
         run: make docs

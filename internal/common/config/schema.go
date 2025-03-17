@@ -20,7 +20,6 @@ type Schema struct {
 	DBSchema       string `validate:"required"`
 	PasswordSecret string `validate:"required"`
 	PasswordRounds uint8  `validate:"required,min=4"`
-	AA             string `validate:"required"`
 }
 
 var schema Schema

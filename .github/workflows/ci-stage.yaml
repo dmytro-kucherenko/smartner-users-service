@@ -3,7 +3,7 @@ name: Pull Request Actions
 on:
   pull_request:
     branches:
-      - '**'
+      - 'stage'
 
 permissions:
   id-token: write
@@ -17,7 +17,8 @@ jobs:
       environment: stage
 
   # TODO: Remove when ready
-  # test:
-  #   uses: ./.github/workflows/cd-template.yaml
-  #   with:
-  #     environment: stage
+  test:
+    uses: ./.github/workflows/cd-template.yaml
+    secrets: inherit
+    with:
+      environment: stage

@@ -8,25 +8,18 @@ on:
         type: string
 
 jobs:
-  config:
-    runs-on: ubuntu-latest
-    environment: ${{ inputs.environment }}
-    steps:
-      - name: Set up actions
-        uses: actions/checkout@v4
-
-      - name: Test environment
-        run: echo ${{ vars.TEST }}
-
-      # Run env validation: make config
-      # Usage during run: ${{ vars.TEST }}
-
   deploy:
     runs-on: ubuntu-latest
     environment: ${{ inputs.environment }}
     steps:
       - name: Set up actions
         uses: actions/checkout@v4
+
+      - name: Set up SDK
+        uses: actions/setup-go@v5
+        with:
+          go-version-file: 'go.mod'
+          cache-dependency-path: 'go.sum'
 
       - name: Set up AWS credentials
         uses: aws-actions/configure-aws-credentials@v1
@@ -35,19 +28,70 @@ jobs:
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: ${{ vars.AWS_REGION }}
 
-      # Environment: secrets, region, stack name, config function name (overrided during deploy)
-      #
-      # sam build config
-      # sam deploy -confirm-changeset config
-      # sam remote invoke ConfigFunction - fail if error
-      #
-      # Parallel:
-      # - sam delete --stack-name --no-prompts
-      #
-      # - docs
-      #   migrate
-      #   sam build service
-      #   sam deploy -confirm-changeset service
-      #
-      # But envoronment should be one. If not possible, then with rollback.
-      # Or deploy once only function in one stack, test it, then use normal stack, using params override outputs export name
+      - name: Download packages
+        run: go mod download
+
+      - name: Deploy DB stack
+        env:
+          AWS_REGION: ${{ vars.AWS_REGION }}
+          AWS_DB_STACK_NAME: ${{ vars.AWS_DB_STACK_NAME }}
+        run: |
+          sam build -t cfn/db.cfn.yaml
+          sam deploy \
+            --stack-name $AWS_DB_STACK_NAME \
+            --resolve-s3 \
+            --s3-prefix $AWS_DB_STACK_NAME \
+            --region $AWS_REGION \
+            --capabilities CAPABILITY_IAM
+
+      - name: Deploy config stack
+        env:
+          AWS_REGION: ${{ vars.AWS_REGION }}
+          AWS_CONFIG_STACK_NAME: ${{ vars.AWS_CONFIG_STACK_NAME }}
+          AWS_CONFIG_FUNCTION_NAME: ${{ vars.AWS_CONFIG_FUNCTION_NAME }}
+        run: |
+          sam build -t cfn/service.cfn.yaml
+          sam deploy \
+            --stack-name $AWS_CONFIG_STACK_NAME \
+            --resolve-s3 \
+            --s3-prefix $AWS_CONFIG_STACK_NAME \
+            --region $AWS_REGION \
+            --capabilities CAPABILITY_IAM
+            --parameter-overrides FunctionName=$AWS_CONFIG_FUNCTION_NAME OnlyConfig=1
+
+      - name: Invoke config
+        env:
+          AWS_CONFIG_FUNCTION_NAME: ${{ vars.AWS_CONFIG_FUNCTION_NAME }}
+        run: sam remove invoke $AWS_CONFIG_FUNCTION_NAME
+
+      - name: Build docs
+        run: make docs
+
+      # - name: Run migrations
+      #   run: |
+      #     aws codebuild start-build \
+      #       --project-name your-codebuild-project-name \
+      #       --region ${{ vars.AWS_REGION }}
+
+      - name: Deploy service stack
+        env:
+          AWS_REGION: ${{ vars.AWS_REGION }}
+          AWS_SERVICE_STACK_NAME: ${{ vars.AWS_SERVICE_STACK_NAME }}
+        run: |
+          sam build -t cfn/service.cfn.yaml
+          sam deploy \
+            --stack-name $AWS_SERVICE_STACK_NAME \
+            --resolve-s3 \
+            --s3-prefix $AWS_SERVICE_STACK_NAME \
+            --region $AWS_REGION \
+            --capabilities CAPABILITY_IAM
+
+# Environment: secrets, region, stack name, config function name (overrided during deploy)
+#
+# sam build function
+# sam deploy test-stack
+# sam remote invoke TestFunction - fail if error
+# docs
+# migrate with codebuild project
+# sam build service
+# sam deploy service

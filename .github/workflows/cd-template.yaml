@@ -31,6 +31,13 @@ jobs:
       - name: Download packages
         run: go mod download
 
+      - name: Test
+        env:
+          AWS_CONFIG_FUNCTION_NAME: ${{ vars.AWS_CONFIG_FUNCTION_NAME }}
+        run: |
+          response=$(sam remote invoke $AWS_CONFIG_FUNCTION_NAME)
+          echo "$response"
+
       - name: Deploy DB stack
         env:
           AWS_REGION: ${{ vars.AWS_REGION }}
@@ -60,9 +67,6 @@ jobs:
             --capabilities CAPABILITY_IAM \
             --parameter-overrides FunctionName=$AWS_CONFIG_FUNCTION_NAME OnlyConfig=1 \
             --no-fail-on-empty-changeset
-
-      - name: Test
-        run: echo "test statement" | grep test
 
       - name: Invoke config
         env:

@@ -37,10 +37,10 @@ jobs:
         run: |
           response=$(sam remote invoke $AWS_CONFIG_FUNCTION_NAME --output text)
           if [[ "$response" == *'"statusCode":500'* ]]; then
-            echo "Lambda invocation failed with error: $response"
+            echo "Config invocation failed: $response"
             exit 1
           else
-            echo "Lambda invocation succeeded: $response"
+            echo "Config invocation succeeded: $response"
           fi
 
       - name: Deploy DB stack

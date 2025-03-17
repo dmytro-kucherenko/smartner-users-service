@@ -48,7 +48,7 @@ func AppURL() string {
 }
 
 func AppOnlyConfig() bool {
-	return schema.AppOnlyConfig
+	return schema.AppOnlyConfig == 1
 }
 
 func ClientURL() string {

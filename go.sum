@@ -18,8 +18,8 @@ github.com/cpuguy83/go-md2man/v2 v2.0.0-20190314233015-f79a8a8ca69d/go.mod h1:ma
 github.com/davecgh/go-spew v1.1.0/go.mod h1:J7Y8YcW2NihsgmVo/mv3lAwl/skON4iLHjSsI+c5H38=
 github.com/davecgh/go-spew v1.1.1 h1:vj9j/u1bqnvCEfJOwUhtlOARqs3+rkHYY13jYWTU97c=
 github.com/davecgh/go-spew v1.1.1/go.mod h1:J7Y8YcW2NihsgmVo/mv3lAwl/skON4iLHjSsI+c5H38=
-github.com/dmytro-kucherenko/smartner-utils-package v0.1.14 h1:TcCi4n9ye04aJw7xWO+gVLcOCRcDSUaUJGmuQGXYNKc=
-github.com/dmytro-kucherenko/smartner-utils-package v0.1.14/go.mod h1:YqgzqQ9uMyYXrEKU7GslDDerhxzWeK2Ye4CRfhP23d4=
+github.com/dmytro-kucherenko/smartner-utils-package v0.1.15 h1:yVj6NUCIeSgz/+CS+xq6unq/a6B0TklZDN5rQbaz+dk=
+github.com/dmytro-kucherenko/smartner-utils-package v0.1.15/go.mod h1:YqgzqQ9uMyYXrEKU7GslDDerhxzWeK2Ye4CRfhP23d4=
 github.com/fsnotify/fsnotify v1.7.0 h1:8JEhPFa5W2WU7YfeZzPNqzMP6Lwt7L2715Ggo0nosvA=
 github.com/fsnotify/fsnotify v1.7.0/go.mod h1:40Bi/Hjc2AVfZrqy+aj+yEI+/bRxZnMJyTJwOpGvigM=
 github.com/gabriel-vasile/mimetype v1.4.8 h1:FfZ3gj38NjllZIeJAmMhr+qKL8Wu+nOoI3GqacKw1NM=

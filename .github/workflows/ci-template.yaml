@@ -46,7 +46,22 @@ jobs:
       - name: Check templates
         run: make lint-deploy
 
-      - name: Build service stack and changeset
+      - name: Build DB stack
+        env:
+          AWS_REGION: ${{ vars.AWS_REGION }}
+          AWS_DB_STACK_NAME: ${{ vars.AWS_DB_STACK_NAME }}
+        run: |
+          sam build -t cfn/db.cfn.yaml
+          sam deploy \
+            --stack-name $AWS_DB_STACK_NAME \
+            --resolve-s3 \
+            --s3-prefix $AWS_DB_STACK_NAME \
+            --region $AWS_REGION \
+            --capabilities CAPABILITY_IAM \
+            --no-execute-changeset
+            --no-fail-on-empty-changeset
+
+      - name: Build service stack
         env:
           AWS_REGION: ${{ vars.AWS_REGION }}
           AWS_SERVICE_STACK_NAME: ${{ vars.AWS_SERVICE_STACK_NAME }}
@@ -59,3 +74,4 @@ jobs:
             --region $AWS_REGION \
             --capabilities CAPABILITY_IAM \
             --no-execute-changeset
+            --no-fail-on-empty-changeset

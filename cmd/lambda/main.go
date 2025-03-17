@@ -38,16 +38,6 @@ func Init(create func(logger types.Logger, meta server.RequestMeta) (internal.St
 		meta := handle(request)
 		options, err := create(logger, meta)
 
-		if options.OnlyConfig {
-			if err != nil {
-				panic(err.Error())
-			}
-
-			return events.APIGatewayProxyResponse{
-				StatusCode: http.StatusOK,
-			}, nil
-		}
-
 		if err != nil {
 			var response dtos.ErrorResponse
 			httpErr, ok := err.(*errors.HttpError)
@@ -73,6 +63,12 @@ func Init(create func(logger types.Logger, meta server.RequestMeta) (internal.St
 				StatusCode: response.Status,
 				Headers:    map[string]string{"Content-Type": "application/json"},
 				Body:       string(body),
+			}, nil
+		}
+
+		if options.OnlyConfig {
+			return events.APIGatewayProxyResponse{
+				StatusCode: http.StatusOK,
 			}, nil
 		}
 

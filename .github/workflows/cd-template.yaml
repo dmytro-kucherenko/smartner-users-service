@@ -34,7 +34,14 @@ jobs:
       - name: Test
         env:
           AWS_CONFIG_FUNCTION_NAME: ${{ vars.AWS_CONFIG_FUNCTION_NAME }}
-        run: sam remote invoke $AWS_CONFIG_FUNCTION_NAME --output text | grep -q '"statusCode":500'
+        run: |
+          response=$(sam remote invoke $AWS_CONFIG_FUNCTION_NAME --output text)
+          if [[ "$response" == *'"statusCode":500'* ]]; then
+            echo "Lambda invocation failed with error: $response"
+            exit 1
+          else
+            echo "Lambda invocation succeeded: $response"
+          fi
 
       - name: Deploy DB stack
         env:

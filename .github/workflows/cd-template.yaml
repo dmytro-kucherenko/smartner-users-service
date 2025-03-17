@@ -34,9 +34,7 @@ jobs:
       - name: Test
         env:
           AWS_CONFIG_FUNCTION_NAME: ${{ vars.AWS_CONFIG_FUNCTION_NAME }}
-        run: |
-          response=$(sam remote invoke $AWS_CONFIG_FUNCTION_NAME)
-          echo "$response"
+        run: sam remote invoke $AWS_CONFIG_FUNCTION_NAME --output text
 
       - name: Deploy DB stack
         env:

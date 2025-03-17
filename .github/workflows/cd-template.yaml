@@ -42,7 +42,7 @@ jobs:
             --resolve-s3 \
             --s3-prefix $AWS_DB_STACK_NAME \
             --region $AWS_REGION \
-            --capabilities CAPABILITY_IAM
+            --capabilities CAPABILITY_IAM \
             --no-fail-on-empty-changeset
 
       - name: Deploy config stack
@@ -57,8 +57,8 @@ jobs:
             --resolve-s3 \
             --s3-prefix $AWS_CONFIG_STACK_NAME \
             --region $AWS_REGION \
-            --capabilities CAPABILITY_IAM
-            --parameter-overrides FunctionName=$AWS_CONFIG_FUNCTION_NAME OnlyConfig=1
+            --capabilities CAPABILITY_IAM \
+            --parameter-overrides FunctionName=$AWS_CONFIG_FUNCTION_NAME OnlyConfig=1 \
             --no-fail-on-empty-changeset
 
       - name: Invoke config
@@ -86,7 +86,7 @@ jobs:
             --resolve-s3 \
             --s3-prefix $AWS_SERVICE_STACK_NAME \
             --region $AWS_REGION \
-            --capabilities CAPABILITY_IAM
+            --capabilities CAPABILITY_IAM \
             --no-fail-on-empty-changeset
 
 # Environment: secrets, region, stack name, config function name (overrided during deploy)

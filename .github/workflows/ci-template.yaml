@@ -58,7 +58,7 @@ jobs:
             --s3-prefix $AWS_DB_STACK_NAME \
             --region $AWS_REGION \
             --capabilities CAPABILITY_IAM \
-            --no-execute-changeset
+            --no-execute-changeset \
             --no-fail-on-empty-changeset
 
       - name: Build service stack
@@ -73,5 +73,5 @@ jobs:
             --s3-prefix $AWS_SERVICE_STACK_NAME \
             --region $AWS_REGION \
             --capabilities CAPABILITY_IAM \
-            --no-execute-changeset
+            --no-execute-changeset \
             --no-fail-on-empty-changeset

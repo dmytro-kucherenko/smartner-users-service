@@ -86,3 +86,4 @@ deploy-db:
 
 lint-deploy:
 	@sam validate -t cfn/service.cfn.yaml --lint
+	@sam validate -t cfn/db.cfn.yaml --lint

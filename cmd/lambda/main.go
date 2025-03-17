@@ -54,7 +54,7 @@ func Init(create func(logger types.Logger, meta server.RequestMeta) (internal.St
 					Message: "internal server error",
 				}
 
-				logger.Fatal(err.Error())
+				logger.Error(err.Error())
 			}
 
 			body, _ := json.Marshal(response)

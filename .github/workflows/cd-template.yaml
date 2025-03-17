@@ -64,7 +64,7 @@ jobs:
       - name: Invoke config
         env:
           AWS_CONFIG_FUNCTION_NAME: ${{ vars.AWS_CONFIG_FUNCTION_NAME }}
-        run: sam remote invoke $AWS_CONFIG_FUNCTION_NAME | tee /dev/tty | grep -q "\"statusCode\":500" && exit 1
+        run: sam remote invoke $AWS_CONFIG_FUNCTION_NAME | grep -q "\"statusCode\":500" && exit 1
 
       - name: Build docs
         run: make docs

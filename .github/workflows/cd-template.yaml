@@ -61,13 +61,16 @@ jobs:
             --parameter-overrides FunctionName=$AWS_CONFIG_FUNCTION_NAME OnlyConfig=1 \
             --no-fail-on-empty-changeset
 
+      - name: Test
+        run: echo "test statement" | grep test
+
       - name: Invoke config
         env:
           AWS_CONFIG_FUNCTION_NAME: ${{ vars.AWS_CONFIG_FUNCTION_NAME }}
-        # run: sam remote invoke $AWS_CONFIG_FUNCTION_NAME | grep -q "\"statusCode\":500" && exit 1
-        run: |
-          response=$(sam remote invoke $AWS_CONFIG_FUNCTION_NAME)
-          echo "$response" | grep -q '"statusCode":500' && exit 1
+        run: sam remote invoke $AWS_CONFIG_FUNCTION_NAME | grep -q "\"statusCode\":500" && exit 1
+        # run: |
+        #   response=$(sam remote invoke $AWS_CONFIG_FUNCTION_NAME)
+        #   echo "$response" | grep -q '"statusCode":500' && exit 1
 
       - name: Build docs
         run: make docs

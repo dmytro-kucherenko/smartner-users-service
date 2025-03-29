@@ -34,7 +34,7 @@ jobs:
       - name: Deploy project stack
         env:
           AWS_REGION: ${{ vars.AWS_REGION }}
-          AWS_DB_STACK_NAME: ${{ vars.AWS_DB_STACK_NAME }}
+          AWS_PROJECT_STACK_NAME: ${{ vars.AWS_PROJECT_STACK_NAME }}
         run: |
           sam build -t cfn/project.cfn.yaml
           sam deploy \

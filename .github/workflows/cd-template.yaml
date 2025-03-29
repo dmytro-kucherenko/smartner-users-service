@@ -41,6 +41,7 @@ jobs:
               build:
                 commands:
                   - echo "postgres://${DB_USERNAME}:${DB_PASSWORD}@${DB_HOST}:${DB_PORT}/${DB_NAME}?search_path=${DB_SCHEMA}"
+                  - go run -tags 'postgres' github.com/golang-migrate/migrate/v4/cmd/migrate@latest -path internal/db/migrations -database "postgres://${DB_USERNAME}:${DB_PASSWORD}@${DB_HOST}:${DB_PORT}/${DB_NAME}?search_path=${DB_SCHEMA}" up
 
   deploy:
     runs-on: ubuntu-latest

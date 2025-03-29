@@ -28,20 +28,10 @@ jobs:
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: ${{ vars.AWS_REGION }}
 
-      - name: Bundle code
-        run: |
-          zip -r code.zip .
-
-      - name: Upload to S3
-        run: |
-          aws s3 cp code.zip s3://db-269733607457-eu-central-1/builds/${{ github.sha }}.zip
-
       - name: Run CodeBuild
         uses: aws-actions/aws-codebuild-run-build@v1
         with:
           project-name: DBBuildProject
-          disable-source-override: true
-          source-location-override: db-269733607457-eu-central-1/builds/${{ github.sha }}.zip
           buildspec-override: |
             version: 0.2
             phases:

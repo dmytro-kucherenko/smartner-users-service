@@ -15,10 +15,3 @@ jobs:
     secrets: inherit
     with:
       environment: stage
-
-  # TODO: Remove when ready
-  test:
-    uses: ./.github/workflows/cd-template.yaml
-    secrets: inherit
-    with:
-      environment: stage

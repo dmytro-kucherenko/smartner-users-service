@@ -40,7 +40,7 @@ jobs:
                   golang: 1.x
               build:
                 commands:
-                  - echo "Test build"
+                  - echo "postgres://${DB_USERNAME}:${DB_PASSWORD}@${DB_HOST}:${DB_PORT}/${DB_NAME}?search_path=${DB_SCHEMA}"
 
   deploy:
     runs-on: ubuntu-latest

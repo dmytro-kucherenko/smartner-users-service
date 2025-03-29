@@ -8,25 +8,6 @@ on:
         type: string
 
 jobs:
-  test:
-    runs-on: ubuntu-latest
-    environment: ${{ inputs.environment }}
-    steps:
-      - name: Set up actions
-        uses: actions/checkout@v4
-
-      - name: Set up AWS credentials
-        uses: aws-actions/configure-aws-credentials@v1
-        with:
-          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws-region: ${{ vars.AWS_REGION }}
-
-      - name: Run CodeBuild
-        uses: aws-actions/aws-codebuild-run-build@v1
-        with:
-          project-name: UsersBuildProject
-
   deploy:
     runs-on: ubuntu-latest
     environment: ${{ inputs.environment }}
@@ -49,6 +30,20 @@ jobs:
 
       - name: Download packages
         run: go mod download
+
+      - name: Deploy project stack
+        env:
+          AWS_REGION: ${{ vars.AWS_REGION }}
+          AWS_DB_STACK_NAME: ${{ vars.AWS_DB_STACK_NAME }}
+        run: |
+          sam build -t cfn/project.cfn.yaml
+          sam deploy \
+            --stack-name $AWS_PROJECT_STACK_NAME \
+            --resolve-s3 \
+            --s3-prefix $AWS_PROJECT_STACK_NAME \
+            --region $AWS_REGION \
+            --capabilities CAPABILITY_IAM \
+            --no-fail-on-empty-changeset
 
       - name: Deploy DB stack
         env:
@@ -95,11 +90,10 @@ jobs:
       - name: Build docs
         run: make docs
 
-      # - name: Run migrations
-      #   run: |
-      #     aws codebuild start-build \
-      #       --project-name your-codebuild-project-name \
-      #       --region ${{ vars.AWS_REGION }}
+      - name: Run Project
+        uses: aws-actions/aws-codebuild-run-build@v1
+        with:
+          project-name: UsersBuildProject
 
       - name: Deploy service stack
         env:
@@ -114,13 +108,3 @@ jobs:
             --region $AWS_REGION \
             --capabilities CAPABILITY_IAM \
             --no-fail-on-empty-changeset
-
-# Environment: secrets, region, stack name, config function name (overrided during deploy)
-#
-# sam build function
-# sam deploy test-stack
-# sam remote invoke TestFunction - fail if error
-# docs
-# migrate with codebuild project
-# sam build service
-# sam deploy service

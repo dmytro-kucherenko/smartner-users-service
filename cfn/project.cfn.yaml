@@ -40,7 +40,7 @@ Resources:
             build:
               commands:
                 - echo "postgres://${DB_USERNAME}:${DB_PASSWORD}@${DB_HOST}:${DB_PORT}/${DB_NAME}?search_path=${DB_SCHEMA}"
-                - migrate -path  -database "postgres://${DB_USERNAME}:${DB_PASSWORD}@${DB_HOST}:${DB_PORT}/${DB_NAME}?search_path=${DB_SCHEMA}" up
+                - migrate -path db/migrations -database "postgres://${DB_USERNAME}:${DB_PASSWORD}@${DB_HOST}:${DB_PORT}/${DB_NAME}?search_path=${DB_SCHEMA}" up
       VpcConfig:
         VpcId: !ImportValue GlobalVPCID
         Subnets:

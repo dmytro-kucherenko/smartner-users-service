@@ -31,21 +31,7 @@ jobs:
       - name: Run CodeBuild
         uses: aws-actions/aws-codebuild-run-build@v1
         with:
-          project-name: MyCodeBuildProject
-          buildspec-override: |
-            version: 0.2
-            phases:
-              install:
-                commands:
-                  - echo "Installing golang-migrate..."
-                  - curl -L https://github.com/golang-migrate/migrate/releases/download/v4.15.2/migrate.linux-amd64.tar.gz -o migrate.tar.gz
-                  - tar -xvzf migrate.tar.gz
-                  - sudo mv migrate /usr/local/bin/migrate
-                  - migrate -version
-              build:
-                commands:
-                  - echo "postgres://${DB_USERNAME}:${DB_PASSWORD}@${DB_HOST}:${DB_PORT}/${DB_NAME}?search_path=${DB_SCHEMA}"
-                  - migrate -path internal/db/migrations -database "postgres://${DB_USERNAME}:${DB_PASSWORD}@${DB_HOST}:${DB_PORT}/${DB_NAME}?search_path=${DB_SCHEMA}" up
+          project-name: MigrationProject
 
   deploy:
     runs-on: ubuntu-latest

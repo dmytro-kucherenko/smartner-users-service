@@ -31,7 +31,16 @@ jobs:
       - name: Run CodeBuild
         uses: aws-actions/aws-codebuild-run-build@v1
         with:
-          project-name: UsersBuildProject
+          project-name: db-migrations-runner
+          buildspec-override: |
+            version: 0.2
+            phases:
+              install:
+                runtime-versions:
+                  golang: 1.x
+              build:
+                commands:
+                  - echo "Test build"
 
   deploy:
     runs-on: ubuntu-latest

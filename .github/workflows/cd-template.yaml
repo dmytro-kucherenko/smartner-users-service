@@ -15,11 +15,11 @@ jobs:
       - name: Set up actions
         uses: actions/checkout@v4
 
-      - name: Set up SDK
-        uses: actions/setup-go@v5
-        with:
-          go-version-file: 'go.mod'
-          cache-dependency-path: 'go.sum'
+      # - name: Set up SDK
+      #   uses: actions/setup-go@v5
+      #   with:
+      #     go-version-file: 'go.mod'
+      #     cache-dependency-path: 'go.sum'
 
       - name: Set up AWS credentials
         uses: aws-actions/configure-aws-credentials@v1
@@ -41,6 +41,7 @@ jobs:
               build:
                 commands:
                   - echo "postgres://${DB_USERNAME}:${DB_PASSWORD}@${DB_HOST}:${DB_PORT}/${DB_NAME}?search_path=${DB_SCHEMA}"
+                  - ls -la
                   - go run -tags 'postgres' github.com/golang-migrate/migrate/v4/cmd/migrate@latest -path internal/db/migrations -database "postgres://${DB_USERNAME}:${DB_PASSWORD}@${DB_HOST}:${DB_PORT}/${DB_NAME}?search_path=${DB_SCHEMA}" up
 
   deploy:

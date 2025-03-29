@@ -2,6 +2,10 @@ AWSTemplateFormatVersion: '2010-09-09'
 Transform: AWS::Serverless-2016-10-31
 
 Parameters:
+  DBSchema:
+    Type: String
+    Default: users
+
   DBEngine:
     Type: String
     Default: aurora-postgresql
@@ -36,3 +40,9 @@ Outputs:
     Value: !GetAtt UsersDBInstance.Endpoint.Port
     Export:
       Name: UsersDBInstancePort
+
+  UsersDBInstanceSchema:
+    Description: "Users DB Schema"
+    Value: !Ref DBSchema
+    Export:
+      Name: UsersDBInstanceSchema

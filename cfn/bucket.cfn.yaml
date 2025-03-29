@@ -1,0 +1,35 @@
+# Resources:
+  # DBS3Bucket:
+  #   Type: 'AWS::S3::Bucket'
+  #   Properties:
+  #     BucketName: !Sub "db-${AWS::AccountId}-${AWS::Region}"
+  #     VersioningConfiguration:
+  #       Status: 'Enabled'
+  #     LifecycleConfiguration:
+  #       Rules:
+  #         - Id: 'ExpireOldMigrations'
+  #           Status: 'Enabled'
+  #           ExpirationInDays: 30
+  #     AccessControl: Private
+  #     OwnershipControls:
+  #       Rules:
+  #         - ObjectOwnership: BucketOwnerPreferred
+
+  # S3VpcEndpoint:
+  #   Type: 'AWS::EC2::VPCEndpoint'
+  #   Properties:
+  #     VpcId: !ImportValue GlobalVPCID
+  #     ServiceName: !Sub "com.amazonaws.${AWS::Region}.s3"
+  #     RouteTableIds:
+  #       - !ImportValue PrivateRouteTableID
+  #     PolicyDocument:
+  #       Version: "2012-10-17"
+  #       Statement:
+  #         - Effect: Allow
+  #           Principal: "*"
+  #           Action:
+  #             - "s3:GetObject"
+  #             - "s3:ListBucket"
+  #           Resource:
+  #             - !GetAtt DBS3Bucket.Arn
+  #             - !Sub "${DBS3Bucket.Arn}/*"

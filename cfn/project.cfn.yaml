@@ -1,0 +1,58 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+
+Resources:
+  UsersBuildProject:
+    Type: AWS::CodeBuild::Project
+    Properties:
+      Name: UsersBuildProject
+      ServiceRole: !ImportValue ProjectRoleARN
+      Environment:
+        Type: LINUX_CONTAINER
+        ComputeType: BUILD_GENERAL1_SMALL
+        Image: aws/codebuild/amazonlinux2-x86_64-standard:3.0
+        EnvironmentVariables:
+          - Name: DB_USERNAME
+            Value: !Sub "{{resolve:secretsmanager:/db:SecretString:username:AWSCURRENT}}"
+          - Name: DB_PASSWORD
+            Value: !Sub "{{resolve:secretsmanager:/db:SecretString:password:AWSCURRENT}}"
+          - Name: DB_HOST
+            Value: !ImportValue UsersDBInstanceHost
+          - Name: DB_PORT
+            Value: !ImportValue UsersDBInstancePort
+          - Name: DB_NAME
+            Value: !Sub "{{resolve:secretsmanager:/db:SecretString:name:AWSCURRENT}}"
+          - Name: DB_SCHEMA
+            Value: !ImportValue UsersDBInstanceSchema
+      Artifacts:
+        Type: NO_ARTIFACTS
+      Source:
+        Type: NO_SOURCE
+        BuildSpec: |
+          version: 0.2
+          phases:
+            install:
+              commands:
+                - curl -L https://github.com/golang-migrate/migrate/releases/download/v4.15.2/migrate.linux-amd64.tar.gz -o migrate.tar.gz
+                - tar -xvzf migrate.tar.gz
+                - sudo mv migrate /usr/local/bin/migrate
+                - migrate -version
+            build:
+              commands:
+                - echo "postgres://${DB_USERNAME}:${DB_PASSWORD}@${DB_HOST}:${DB_PORT}/${DB_NAME}?search_path=${DB_SCHEMA}"
+                - migrate -path  -database "postgres://${DB_USERNAME}:${DB_PASSWORD}@${DB_HOST}:${DB_PORT}/${DB_NAME}?search_path=${DB_SCHEMA}" up
+      VpcConfig:
+        VpcId: !ImportValue GlobalVPCID
+        Subnets:
+          - !ImportValue  PrivateSubnetAID
+          - !ImportValue PrivateSubnetBID
+        SecurityGroupIds:
+          - !ImportValue ProjectSecurityGroupID
+
+
+Outputs:
+  UsersBuildProjectID:
+    Description: "ID of users Build Project"
+    Value: !Ref UsersBuildProject
+    Export:
+      Name: UsersBuildProjectID

@@ -84,6 +84,10 @@ deploy-db:
 	@sam build -t cfn/db.cfn.yaml
 	@sam deploy --config-file db.sam.toml
 
+deploy-project:
+	@sam build -t cfn/project.cfn.yaml
+	@sam deploy --config-file project.sam.toml --capabilities CAPABILITY_NAMED_IAM
+
 lint-deploy:
 	@sam validate -t cfn/service.cfn.yaml --lint
 	@sam validate -t cfn/db.cfn.yaml --lint

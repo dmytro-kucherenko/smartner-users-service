@@ -1,17 +1,12 @@
 {
     "swagger": "2.0",
     "info": {
-        "description": "This is a users service example.",
-        "title": "Users API",
         "contact": {},
         "license": {
             "name": "Apache 2.0",
             "url": "http://www.apache.org/licenses/LICENSE-2.0.html"
-        },
-        "version": "1.0"
+        }
     },
-    "host": "localhost:8000",
-    "basePath": "/api/v1",
     "paths": {
         "/users/delete/:id": {
             "delete": {
@@ -68,6 +63,11 @@
         },
         "/users/get/:id": {
             "get": {
+                "security": [
+                    {
+                        "JWTAuth": []
+                    }
+                ],
                 "consumes": [
                     "application/json"
                 ],
@@ -110,6 +110,11 @@
         },
         "/users/page": {
             "get": {
+                "security": [
+                    {
+                        "JWTAuth": []
+                    }
+                ],
                 "consumes": [
                     "application/json"
                 ],
@@ -203,6 +208,11 @@
         },
         "/users/signUp": {
             "post": {
+                "security": [
+                    {
+                        "JWTAuth": []
+                    }
+                ],
                 "consumes": [
                     "application/json"
                 ],
@@ -350,13 +360,13 @@
         "UserItemDto": {
             "type": "object",
             "properties": {
-                "firstname": {
+                "firstName": {
                     "type": "string"
                 },
                 "id": {
                     "type": "string"
                 },
-                "secondname": {
+                "lastName": {
                     "type": "string"
                 }
             }
@@ -380,18 +390,18 @@
             "type": "object",
             "required": [
                 "email",
-                "firstname",
-                "lastname",
+                "firstName",
+                "lastName",
                 "password"
             ],
             "properties": {
                 "email": {
                     "type": "string"
                 },
-                "firstname": {
+                "firstName": {
                     "type": "string"
                 },
-                "lastname": {
+                "lastName": {
                     "type": "string"
                 },
                 "password": {
@@ -402,10 +412,10 @@
         "UserUpdateBodyDto": {
             "type": "object",
             "properties": {
-                "firstname": {
+                "firstName": {
                     "type": "string"
                 },
-                "lastname": {
+                "lastName": {
                     "type": "string"
                 }
             }
@@ -427,7 +437,7 @@
     },
     "securityDefinitions": {
         "JWTAuth": {
-            "description": "Bearer JWT authorization guard",
+            "description": "JWT authorization guard",
             "type": "apiKey",
             "name": "Authorization",
             "in": "header"

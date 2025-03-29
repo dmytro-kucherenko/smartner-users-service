@@ -31,7 +31,7 @@ func (service *Main) Get(ctx context.Context, filters dtos.GetRequest) (user dto
 	})
 
 	if err != nil {
-		err = errors.NewHttpError(http.StatusNotFound, "User was not found.")
+		err = errors.NewHttpError(http.StatusNotFound, "user was not found.")
 
 		return
 	}
@@ -71,7 +71,7 @@ func (service *Main) SignIn(ctx context.Context, payload dtos.SignInRequest) (us
 	})
 
 	if err != nil {
-		err = errors.NewHttpError(http.StatusUnauthorized, "User was not found.")
+		err = errors.NewHttpError(http.StatusUnauthorized, "user was not found.")
 
 		return
 	}
@@ -82,7 +82,7 @@ func (service *Main) SignIn(ctx context.Context, payload dtos.SignInRequest) (us
 	})
 
 	if !ok {
-		err = errors.NewHttpError(http.StatusUnauthorized, "User password is not correct.")
+		err = errors.NewHttpError(http.StatusUnauthorized, "user password is not correct.")
 
 		return
 	}
@@ -98,7 +98,7 @@ func (service *Main) SignUp(ctx context.Context, payload dtos.SignUpRequest) (us
 	})
 
 	if err == nil {
-		err = errors.NewHttpError(http.StatusConflict, "User with this email already exists.")
+		err = errors.NewHttpError(http.StatusConflict, "user with this email already exists.")
 
 		return
 	}

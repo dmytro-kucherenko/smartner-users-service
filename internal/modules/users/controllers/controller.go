@@ -45,8 +45,8 @@ func (controller *Main) get(options *server.RequestOptions[dtos.GetParams]) (dto
 // @Security JWTAuth
 // @Accept		json
 // @Produce	json
-// @Param		name	query		UsersGetAllQueryDto	true	"Page Filters"
-// @Success	200		{object}	UsersPageDto
+// @Param		name	query		UserGetAllParamsDto	true	"Page Filters"
+// @Success	200		{object}	UserPageDto
 // @Failure	400		{object}	ErrorDto
 // @Router		/users/page [get]
 func (controller *Main) getPage(options *server.RequestOptions[dtos.GetAllParams]) (dtos.Page, error) {
@@ -57,7 +57,7 @@ func (controller *Main) getPage(options *server.RequestOptions[dtos.GetAllParams
 // @Tags		Users
 // @Accept		json
 // @Produce	json
-// @Param		body	body		UserSignInBodyDto	true	"User Data"
+// @Param		body	body		UserSignInParamsDto	true	"User Data"
 // @Success	200		{object}	UserItemDto
 // @Failure	400		{object}	ErrorDto
 // @Failure	401		{object}	ErrorDto
@@ -72,7 +72,7 @@ func (controller *Main) signIn(options *server.RequestOptions[dtos.SignInParams]
 // @Security JWTAuth
 // @Accept		json
 // @Produce	json
-// @Param		body	body		UserSignUpBodyDto	true	"User Data"
+// @Param		body	body		UserSignUpParamsDto	true	"User Data"
 // @Success	200		{object}	UserItemDto
 // @Failure	400		{object}	ErrorDto
 // @Failure	401		{object}	ErrorDto
@@ -87,7 +87,7 @@ func (controller *Main) signUp(options *server.RequestOptions[dtos.SignUpParams]
 // @Security JWTAuth
 // @Accept		json
 // @Produce	json
-// @Param		body	body		UserUpdateBodyDto	true	"User Data"
+// @Param		body	body		UserUpdateParamsDto	true	"User Data"
 // @Success	200		{object}	UserItemDto
 // @Failure	400		{object}	ErrorDto
 // @Failure	401		{object}	ErrorDto

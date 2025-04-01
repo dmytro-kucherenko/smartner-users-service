@@ -11,7 +11,7 @@ type GetParams struct {
 
 type GetAllParams struct {
 	dtos.PageParams
-} // @name UsersGetAllParamsDto
+} // @name UserGetAllParamsDto
 
 type SignInParams struct {
 	Email    string `json:"email" validate:"required,email"`
@@ -40,4 +40,4 @@ type Item struct {
 type Page struct {
 	Items []Item        `json:"items"`
 	Meta  dtos.PageMeta `json:"meta"`
-} // @name UsersPageDto
+} // @name UserPageDto

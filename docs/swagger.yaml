@@ -10,7 +10,7 @@ definitions:
       status:
         type: integer
     type: object
-  PaginationMetaDto:
+  PageMetaDTO:
     properties:
       next:
         type: integer
@@ -32,7 +32,16 @@ definitions:
       lastName:
         type: string
     type: object
-  UserSignInBodyDto:
+  UserPageDto:
+    properties:
+      items:
+        items:
+          $ref: '#/definitions/UserItemDto'
+        type: array
+      meta:
+        $ref: '#/definitions/PageMetaDTO'
+    type: object
+  UserSignInParamsDto:
     properties:
       email:
         type: string
@@ -42,7 +51,7 @@ definitions:
     - email
     - password
     type: object
-  UserSignUpBodyDto:
+  UserSignUpParamsDto:
     properties:
       email:
         type: string
@@ -58,21 +67,16 @@ definitions:
     - lastName
     - password
     type: object
-  UserUpdateBodyDto:
+  UserUpdateParamsDto:
     properties:
       firstName:
         type: string
+      id:
+        type: string
       lastName:
         type: string
-    type: object
-  UsersPageDto:
-    properties:
-      items:
-        items:
-          $ref: '#/definitions/UserItemDto'
-        type: array
-      meta:
-        $ref: '#/definitions/PaginationMetaDto'
+    required:
+    - id
     type: object
 info:
   contact: {}
@@ -161,7 +165,7 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/UsersPageDto'
+            $ref: '#/definitions/UserPageDto'
         "400":
           description: Bad Request
           schema:
@@ -181,7 +185,7 @@ paths:
         name: body
         required: true
         schema:
-          $ref: '#/definitions/UserSignInBodyDto'
+          $ref: '#/definitions/UserSignInParamsDto'
       produces:
       - application/json
       responses:
@@ -214,7 +218,7 @@ paths:
         name: body
         required: true
         schema:
-          $ref: '#/definitions/UserSignUpBodyDto'
+          $ref: '#/definitions/UserSignUpParamsDto'
       produces:
       - application/json
       responses:
@@ -249,7 +253,7 @@ paths:
         name: body
         required: true
         schema:
-          $ref: '#/definitions/UserUpdateBodyDto'
+          $ref: '#/definitions/UserUpdateParamsDto'
       produces:
       - application/json
       responses:

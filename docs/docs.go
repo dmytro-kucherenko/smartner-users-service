@@ -154,7 +154,7 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/UsersPageDto"
+                            "$ref": "#/definitions/UserPageDto"
                         }
                     },
                     "400": {
@@ -185,7 +185,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/UserSignInBodyDto"
+                            "$ref": "#/definitions/UserSignInParamsDto"
                         }
                     }
                 ],
@@ -241,7 +241,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/UserSignUpBodyDto"
+                            "$ref": "#/definitions/UserSignUpParamsDto"
                         }
                     }
                 ],
@@ -297,7 +297,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/UserUpdateBodyDto"
+                            "$ref": "#/definitions/UserUpdateParamsDto"
                         }
                     }
                 ],
@@ -348,7 +348,7 @@ const docTemplate = `{
                 }
             }
         },
-        "PaginationMetaDto": {
+        "PageMetaDTO": {
             "type": "object",
             "properties": {
                 "next": {
@@ -382,7 +382,21 @@ const docTemplate = `{
                 }
             }
         },
-        "UserSignInBodyDto": {
+        "UserPageDto": {
+            "type": "object",
+            "properties": {
+                "items": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/UserItemDto"
+                    }
+                },
+                "meta": {
+                    "$ref": "#/definitions/PageMetaDTO"
+                }
+            }
+        },
+        "UserSignInParamsDto": {
             "type": "object",
             "required": [
                 "email",
@@ -397,7 +411,7 @@ const docTemplate = `{
                 }
             }
         },
-        "UserSignUpBodyDto": {
+        "UserSignUpParamsDto": {
             "type": "object",
             "required": [
                 "email",
@@ -420,28 +434,20 @@ const docTemplate = `{
                 }
             }
         },
-        "UserUpdateBodyDto": {
+        "UserUpdateParamsDto": {
             "type": "object",
+            "required": [
+                "id"
+            ],
             "properties": {
                 "firstName": {
                     "type": "string"
                 },
+                "id": {
+                    "type": "string"
+                },
                 "lastName": {
                     "type": "string"
-                }
-            }
-        },
-        "UsersPageDto": {
-            "type": "object",
-            "properties": {
-                "items": {
-                    "type": "array",
-                    "items": {
-                        "$ref": "#/definitions/UserItemDto"
-                    }
-                },
-                "meta": {
-                    "$ref": "#/definitions/PaginationMetaDto"
                 }
             }
         }

@@ -7,10 +7,9 @@ import (
 	"github.com/Dmytro-Kucherenko/smartner-users-service/internal/common/config"
 	"github.com/Dmytro-Kucherenko/smartner-users-service/internal/modules"
 	"github.com/dmytro-kucherenko/smartner-utils-package/pkg/log/types"
-	validator "github.com/dmytro-kucherenko/smartner-utils-package/pkg/schema/adapters/playground"
+	schema "github.com/dmytro-kucherenko/smartner-utils-package/pkg/schema/adapters/playground"
 	"github.com/dmytro-kucherenko/smartner-utils-package/pkg/server"
 	adapter "github.com/dmytro-kucherenko/smartner-utils-package/pkg/server/adapters/gin"
-	"github.com/gin-gonic/gin/binding"
 )
 
 const (
@@ -43,12 +42,14 @@ func Init(logger types.Logger, meta server.RequestMeta) (options adapter.Startup
 		return
 	}
 
-	err = validator.TryRegister(binding.Validator.Engine())
+	validator, err := schema.NewParamsValidator()
 	if err != nil {
 		return
 	}
 
+	meta.Validator = validator
 	onlyConfig := config.AppOnlyConfig()
+
 	if onlyConfig {
 		return adapter.StartupOptions{
 			Router: nil,

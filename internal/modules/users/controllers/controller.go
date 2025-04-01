@@ -36,7 +36,7 @@ func (controller *Main) Init(group *gin.RouterGroup, meta server.RequestMeta) {
 // @Failure	400		{object}	ErrorDto
 // @Failure	404		{object}	ErrorDto
 // @Router		/users/get/:id [get]
-func (controller *Main) get(options *server.RequestOptions[any, dtos.GetRequest, any]) (dtos.ItemResponse, error) {
+func (controller *Main) get(options *server.RequestOptions[dtos.GetParams]) (dtos.Item, error) {
 	return controller.service.Get(options.Ctx, options.Params)
 }
 
@@ -45,26 +45,26 @@ func (controller *Main) get(options *server.RequestOptions[any, dtos.GetRequest,
 // @Security JWTAuth
 // @Accept		json
 // @Produce	json
-// @Param		name	query		UsersGetAllQueryDto	true	"Page Filters"
-// @Success	200		{object}	UsersPageDto
+// @Param		name	query		UserGetAllParamsDto	true	"Page Filters"
+// @Success	200		{object}	UserPageDto
 // @Failure	400		{object}	ErrorDto
 // @Router		/users/page [get]
-func (controller *Main) getPage(options *server.RequestOptions[any, any, dtos.GetAllRequest]) (dtos.PageResponse, error) {
-	return controller.service.GetPage(options.Ctx, options.Query)
+func (controller *Main) getPage(options *server.RequestOptions[dtos.GetAllParams]) (dtos.Page, error) {
+	return controller.service.GetPage(options.Ctx, options.Params)
 }
 
 // @Summary	Sign in user
 // @Tags		Users
 // @Accept		json
 // @Produce	json
-// @Param		body	body		UserSignInBodyDto	true	"User Data"
+// @Param		body	body		UserSignInParamsDto	true	"User Data"
 // @Success	200		{object}	UserItemDto
 // @Failure	400		{object}	ErrorDto
 // @Failure	401		{object}	ErrorDto
 // @Failure	409		{object}	ErrorDto
 // @Router		/users/signIn [post]
-func (controller *Main) signIn(options *server.RequestOptions[dtos.SignInRequest, any, any]) (dtos.ItemResponse, error) {
-	return controller.service.SignIn(options.Ctx, options.Body)
+func (controller *Main) signIn(options *server.RequestOptions[dtos.SignInParams]) (dtos.Item, error) {
+	return controller.service.SignIn(options.Ctx, options.Params)
 }
 
 // @Summary	Sign up user
@@ -72,14 +72,14 @@ func (controller *Main) signIn(options *server.RequestOptions[dtos.SignInRequest
 // @Security JWTAuth
 // @Accept		json
 // @Produce	json
-// @Param		body	body		UserSignUpBodyDto	true	"User Data"
+// @Param		body	body		UserSignUpParamsDto	true	"User Data"
 // @Success	200		{object}	UserItemDto
 // @Failure	400		{object}	ErrorDto
 // @Failure	401		{object}	ErrorDto
 // @Failure	409		{object}	ErrorDto
 // @Router		/users/signUp [post]
-func (controller *Main) signUp(options *server.RequestOptions[dtos.SignUpRequest, any, any]) (dtos.ItemResponse, error) {
-	return controller.service.SignUp(options.Ctx, options.Body)
+func (controller *Main) signUp(options *server.RequestOptions[dtos.SignUpParams]) (dtos.Item, error) {
+	return controller.service.SignUp(options.Ctx, options.Params)
 }
 
 // @Summary	Update user
@@ -87,14 +87,14 @@ func (controller *Main) signUp(options *server.RequestOptions[dtos.SignUpRequest
 // @Security JWTAuth
 // @Accept		json
 // @Produce	json
-// @Param		body	body		UserUpdateBodyDto	true	"User Data"
+// @Param		body	body		UserUpdateParamsDto	true	"User Data"
 // @Success	200		{object}	UserItemDto
 // @Failure	400		{object}	ErrorDto
 // @Failure	401		{object}	ErrorDto
 // @Failure	404		{object}	ErrorDto
 // @Router		/users/update/:id [put]
-func (controller *Main) update(options *server.RequestOptions[dtos.UpdateRequest, dtos.GetRequest, any]) (dtos.ItemResponse, error) {
-	return controller.service.Update(options.Ctx, options.Params, options.Body)
+func (controller *Main) update(options *server.RequestOptions[dtos.UpdateParams]) (dtos.Item, error) {
+	return controller.service.Update(options.Ctx, options.Params)
 }
 
 // @Summary	Delete user
@@ -108,6 +108,6 @@ func (controller *Main) update(options *server.RequestOptions[dtos.UpdateRequest
 // @Failure	401		{object}	ErrorDto
 // @Failure	404		{object}	ErrorDto
 // @Router		/users/delete/:id [delete]
-func (controller *Main) delete(options *server.RequestOptions[any, dtos.GetRequest, any]) (dtos.ItemResponse, error) {
+func (controller *Main) delete(options *server.RequestOptions[dtos.GetParams]) (dtos.Item, error) {
 	return controller.service.Delete(options.Ctx, options.Params)
 }

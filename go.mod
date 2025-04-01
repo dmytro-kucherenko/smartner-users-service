@@ -3,7 +3,7 @@ module github.com/Dmytro-Kucherenko/smartner-users-service
 go 1.24.1
 
 require (
-	github.com/dmytro-kucherenko/smartner-utils-package v0.1.15
+	github.com/dmytro-kucherenko/smartner-utils-package v0.1.17
 	github.com/gin-gonic/gin v1.10.0
 	github.com/google/uuid v1.6.0
 )

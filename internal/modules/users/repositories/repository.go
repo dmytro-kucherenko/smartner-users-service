@@ -61,25 +61,25 @@ func (service *Main) FindPage(ctx context.Context, filters FindPageParams) ([]It
 	return items, nil
 }
 
-func (service *Main) Create(ctx context.Context, payload CreateParams) (ItemQuery, error) {
+func (service *Main) Create(ctx context.Context, params CreateParams) (ItemQuery, error) {
 	user, err := service.queries().Create(ctx, db.CreateParams{
-		FirstName:    payload.FirstName,
-		LastName:     payload.LastName,
-		Email:        payload.Email,
-		PasswordHash: payload.PasswordHash,
-		PasswordSalt: payload.PasswordSalt,
+		FirstName:    params.FirstName,
+		LastName:     params.LastName,
+		Email:        params.Email,
+		PasswordHash: params.PasswordHash,
+		PasswordSalt: params.PasswordSalt,
 	})
 
 	return user, err
 }
 
-func (service *Main) Update(ctx context.Context, ID types.ID, payload *UpdateParams) (ItemQuery, error) {
+func (service *Main) Update(ctx context.Context, ID types.ID, params *UpdateParams) (ItemQuery, error) {
 	return service.queries().Update(ctx, db.UpdateParams{
 		ID:           ID,
-		FirstName:    sql.NullString{String: payload.FirstName.Value, Valid: payload.FirstName.Valid},
-		LastName:     sql.NullString{String: payload.LastName.Value, Valid: payload.LastName.Valid},
-		PasswordHash: sql.NullString{String: payload.PasswordHash.Value, Valid: payload.PasswordHash.Valid},
-		PasswordSalt: sql.NullString{String: payload.PasswordSalt.Value, Valid: payload.PasswordSalt.Valid},
+		FirstName:    sql.NullString{String: params.FirstName.Value, Valid: params.FirstName.Valid},
+		LastName:     sql.NullString{String: params.LastName.Value, Valid: params.LastName.Valid},
+		PasswordHash: sql.NullString{String: params.PasswordHash.Value, Valid: params.PasswordHash.Valid},
+		PasswordSalt: sql.NullString{String: params.PasswordSalt.Value, Valid: params.PasswordSalt.Valid},
 	})
 }
 

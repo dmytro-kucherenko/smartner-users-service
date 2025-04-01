@@ -36,7 +36,7 @@ func (controller *Main) Init(group *gin.RouterGroup, meta server.RequestMeta) {
 // @Failure	400		{object}	ErrorDto
 // @Failure	404		{object}	ErrorDto
 // @Router		/users/get/:id [get]
-func (controller *Main) get(options *server.RequestOptions[any, dtos.GetRequest, any]) (dtos.ItemResponse, error) {
+func (controller *Main) get(options *server.RequestOptions[dtos.GetParams]) (dtos.Item, error) {
 	return controller.service.Get(options.Ctx, options.Params)
 }
 
@@ -49,8 +49,8 @@ func (controller *Main) get(options *server.RequestOptions[any, dtos.GetRequest,
 // @Success	200		{object}	UsersPageDto
 // @Failure	400		{object}	ErrorDto
 // @Router		/users/page [get]
-func (controller *Main) getPage(options *server.RequestOptions[any, any, dtos.GetAllRequest]) (dtos.PageResponse, error) {
-	return controller.service.GetPage(options.Ctx, options.Query)
+func (controller *Main) getPage(options *server.RequestOptions[dtos.GetAllParams]) (dtos.Page, error) {
+	return controller.service.GetPage(options.Ctx, options.Params)
 }
 
 // @Summary	Sign in user
@@ -63,8 +63,8 @@ func (controller *Main) getPage(options *server.RequestOptions[any, any, dtos.Ge
 // @Failure	401		{object}	ErrorDto
 // @Failure	409		{object}	ErrorDto
 // @Router		/users/signIn [post]
-func (controller *Main) signIn(options *server.RequestOptions[dtos.SignInRequest, any, any]) (dtos.ItemResponse, error) {
-	return controller.service.SignIn(options.Ctx, options.Body)
+func (controller *Main) signIn(options *server.RequestOptions[dtos.SignInParams]) (dtos.Item, error) {
+	return controller.service.SignIn(options.Ctx, options.Params)
 }
 
 // @Summary	Sign up user
@@ -78,8 +78,8 @@ func (controller *Main) signIn(options *server.RequestOptions[dtos.SignInRequest
 // @Failure	401		{object}	ErrorDto
 // @Failure	409		{object}	ErrorDto
 // @Router		/users/signUp [post]
-func (controller *Main) signUp(options *server.RequestOptions[dtos.SignUpRequest, any, any]) (dtos.ItemResponse, error) {
-	return controller.service.SignUp(options.Ctx, options.Body)
+func (controller *Main) signUp(options *server.RequestOptions[dtos.SignUpParams]) (dtos.Item, error) {
+	return controller.service.SignUp(options.Ctx, options.Params)
 }
 
 // @Summary	Update user
@@ -93,8 +93,8 @@ func (controller *Main) signUp(options *server.RequestOptions[dtos.SignUpRequest
 // @Failure	401		{object}	ErrorDto
 // @Failure	404		{object}	ErrorDto
 // @Router		/users/update/:id [put]
-func (controller *Main) update(options *server.RequestOptions[dtos.UpdateRequest, dtos.GetRequest, any]) (dtos.ItemResponse, error) {
-	return controller.service.Update(options.Ctx, options.Params, options.Body)
+func (controller *Main) update(options *server.RequestOptions[dtos.UpdateParams]) (dtos.Item, error) {
+	return controller.service.Update(options.Ctx, options.Params)
 }
 
 // @Summary	Delete user
@@ -108,6 +108,6 @@ func (controller *Main) update(options *server.RequestOptions[dtos.UpdateRequest
 // @Failure	401		{object}	ErrorDto
 // @Failure	404		{object}	ErrorDto
 // @Router		/users/delete/:id [delete]
-func (controller *Main) delete(options *server.RequestOptions[any, dtos.GetRequest, any]) (dtos.ItemResponse, error) {
+func (controller *Main) delete(options *server.RequestOptions[dtos.GetParams]) (dtos.Item, error) {
 	return controller.service.Delete(options.Ctx, options.Params)
 }

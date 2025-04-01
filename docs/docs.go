@@ -74,6 +74,11 @@ const docTemplate = `{
         },
         "/users/get/:id": {
             "get": {
+                "security": [
+                    {
+                        "JWTAuth": []
+                    }
+                ],
                 "consumes": [
                     "application/json"
                 ],
@@ -116,6 +121,11 @@ const docTemplate = `{
         },
         "/users/page": {
             "get": {
+                "security": [
+                    {
+                        "JWTAuth": []
+                    }
+                ],
                 "consumes": [
                     "application/json"
                 ],
@@ -144,7 +154,7 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/UsersPageDto"
+                            "$ref": "#/definitions/UserPageDto"
                         }
                     },
                     "400": {
@@ -175,7 +185,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/UserSignInBodyDto"
+                            "$ref": "#/definitions/UserSignInParamsDto"
                         }
                     }
                 ],
@@ -209,6 +219,11 @@ const docTemplate = `{
         },
         "/users/signUp": {
             "post": {
+                "security": [
+                    {
+                        "JWTAuth": []
+                    }
+                ],
                 "consumes": [
                     "application/json"
                 ],
@@ -226,7 +241,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/UserSignUpBodyDto"
+                            "$ref": "#/definitions/UserSignUpParamsDto"
                         }
                     }
                 ],
@@ -282,7 +297,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/UserUpdateBodyDto"
+                            "$ref": "#/definitions/UserUpdateParamsDto"
                         }
                     }
                 ],
@@ -333,7 +348,7 @@ const docTemplate = `{
                 }
             }
         },
-        "PaginationMetaDto": {
+        "PageMetaDTO": {
             "type": "object",
             "properties": {
                 "next": {
@@ -356,67 +371,18 @@ const docTemplate = `{
         "UserItemDto": {
             "type": "object",
             "properties": {
-                "firstname": {
+                "firstName": {
                     "type": "string"
                 },
                 "id": {
                     "type": "string"
                 },
-                "secondname": {
+                "lastName": {
                     "type": "string"
                 }
             }
         },
-        "UserSignInBodyDto": {
-            "type": "object",
-            "required": [
-                "email",
-                "password"
-            ],
-            "properties": {
-                "email": {
-                    "type": "string"
-                },
-                "password": {
-                    "type": "string"
-                }
-            }
-        },
-        "UserSignUpBodyDto": {
-            "type": "object",
-            "required": [
-                "email",
-                "firstname",
-                "lastname",
-                "password"
-            ],
-            "properties": {
-                "email": {
-                    "type": "string"
-                },
-                "firstname": {
-                    "type": "string"
-                },
-                "lastname": {
-                    "type": "string"
-                },
-                "password": {
-                    "type": "string"
-                }
-            }
-        },
-        "UserUpdateBodyDto": {
-            "type": "object",
-            "properties": {
-                "firstname": {
-                    "type": "string"
-                },
-                "lastname": {
-                    "type": "string"
-                }
-            }
-        },
-        "UsersPageDto": {
+        "UserPageDto": {
             "type": "object",
             "properties": {
                 "items": {
@@ -426,14 +392,69 @@ const docTemplate = `{
                     }
                 },
                 "meta": {
-                    "$ref": "#/definitions/PaginationMetaDto"
+                    "$ref": "#/definitions/PageMetaDTO"
+                }
+            }
+        },
+        "UserSignInParamsDto": {
+            "type": "object",
+            "required": [
+                "email",
+                "password"
+            ],
+            "properties": {
+                "email": {
+                    "type": "string"
+                },
+                "password": {
+                    "type": "string"
+                }
+            }
+        },
+        "UserSignUpParamsDto": {
+            "type": "object",
+            "required": [
+                "email",
+                "firstName",
+                "lastName",
+                "password"
+            ],
+            "properties": {
+                "email": {
+                    "type": "string"
+                },
+                "firstName": {
+                    "type": "string"
+                },
+                "lastName": {
+                    "type": "string"
+                },
+                "password": {
+                    "type": "string"
+                }
+            }
+        },
+        "UserUpdateParamsDto": {
+            "type": "object",
+            "required": [
+                "id"
+            ],
+            "properties": {
+                "firstName": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "lastName": {
+                    "type": "string"
                 }
             }
         }
     },
     "securityDefinitions": {
         "JWTAuth": {
-            "description": "Bearer JWT authorization guard",
+            "description": "JWT authorization guard",
             "type": "apiKey",
             "name": "Authorization",
             "in": "header"
@@ -443,12 +464,12 @@ const docTemplate = `{
 
 // SwaggerInfo holds exported Swagger Info so clients can modify it
 var SwaggerInfo = &swag.Spec{
-	Version:          "1.0",
-	Host:             "localhost:8000",
-	BasePath:         "/api/v1",
+	Version:          "",
+	Host:             "",
+	BasePath:         "",
 	Schemes:          []string{},
-	Title:            "Users API",
-	Description:      "This is a users service example.",
+	Title:            "",
+	Description:      "",
 	InfoInstanceName: "swagger",
 	SwaggerTemplate:  docTemplate,
 	LeftDelim:        "{{",

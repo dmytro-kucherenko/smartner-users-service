@@ -2,8 +2,8 @@ root = "."
 tmp_dir = "tmp"
 
 [build]
-  bin = "bin/main"
-  cmd = "make build"
+  bin = "bin/local"
+  cmd = "make build-local"
   delay = 1000
   exclude_dir = ["assets", "tmp"]
   exclude_unchanged = false

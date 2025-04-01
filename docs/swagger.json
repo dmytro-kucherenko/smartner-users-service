@@ -1,17 +1,12 @@
 {
     "swagger": "2.0",
     "info": {
-        "description": "This is a users service example.",
-        "title": "Users API",
         "contact": {},
         "license": {
             "name": "Apache 2.0",
             "url": "http://www.apache.org/licenses/LICENSE-2.0.html"
-        },
-        "version": "1.0"
+        }
     },
-    "host": "localhost:8000",
-    "basePath": "/api/v1",
     "paths": {
         "/users/delete/:id": {
             "delete": {
@@ -68,6 +63,11 @@
         },
         "/users/get/:id": {
             "get": {
+                "security": [
+                    {
+                        "JWTAuth": []
+                    }
+                ],
                 "consumes": [
                     "application/json"
                 ],
@@ -110,6 +110,11 @@
         },
         "/users/page": {
             "get": {
+                "security": [
+                    {
+                        "JWTAuth": []
+                    }
+                ],
                 "consumes": [
                     "application/json"
                 ],
@@ -138,7 +143,7 @@
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/UsersPageDto"
+                            "$ref": "#/definitions/UserPageDto"
                         }
                     },
                     "400": {
@@ -169,7 +174,7 @@
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/UserSignInBodyDto"
+                            "$ref": "#/definitions/UserSignInParamsDto"
                         }
                     }
                 ],
@@ -203,6 +208,11 @@
         },
         "/users/signUp": {
             "post": {
+                "security": [
+                    {
+                        "JWTAuth": []
+                    }
+                ],
                 "consumes": [
                     "application/json"
                 ],
@@ -220,7 +230,7 @@
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/UserSignUpBodyDto"
+                            "$ref": "#/definitions/UserSignUpParamsDto"
                         }
                     }
                 ],
@@ -276,7 +286,7 @@
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/UserUpdateBodyDto"
+                            "$ref": "#/definitions/UserUpdateParamsDto"
                         }
                     }
                 ],
@@ -327,7 +337,7 @@
                 }
             }
         },
-        "PaginationMetaDto": {
+        "PageMetaDTO": {
             "type": "object",
             "properties": {
                 "next": {
@@ -350,67 +360,18 @@
         "UserItemDto": {
             "type": "object",
             "properties": {
-                "firstname": {
+                "firstName": {
                     "type": "string"
                 },
                 "id": {
                     "type": "string"
                 },
-                "secondname": {
+                "lastName": {
                     "type": "string"
                 }
             }
         },
-        "UserSignInBodyDto": {
-            "type": "object",
-            "required": [
-                "email",
-                "password"
-            ],
-            "properties": {
-                "email": {
-                    "type": "string"
-                },
-                "password": {
-                    "type": "string"
-                }
-            }
-        },
-        "UserSignUpBodyDto": {
-            "type": "object",
-            "required": [
-                "email",
-                "firstname",
-                "lastname",
-                "password"
-            ],
-            "properties": {
-                "email": {
-                    "type": "string"
-                },
-                "firstname": {
-                    "type": "string"
-                },
-                "lastname": {
-                    "type": "string"
-                },
-                "password": {
-                    "type": "string"
-                }
-            }
-        },
-        "UserUpdateBodyDto": {
-            "type": "object",
-            "properties": {
-                "firstname": {
-                    "type": "string"
-                },
-                "lastname": {
-                    "type": "string"
-                }
-            }
-        },
-        "UsersPageDto": {
+        "UserPageDto": {
             "type": "object",
             "properties": {
                 "items": {
@@ -420,14 +381,69 @@
                     }
                 },
                 "meta": {
-                    "$ref": "#/definitions/PaginationMetaDto"
+                    "$ref": "#/definitions/PageMetaDTO"
+                }
+            }
+        },
+        "UserSignInParamsDto": {
+            "type": "object",
+            "required": [
+                "email",
+                "password"
+            ],
+            "properties": {
+                "email": {
+                    "type": "string"
+                },
+                "password": {
+                    "type": "string"
+                }
+            }
+        },
+        "UserSignUpParamsDto": {
+            "type": "object",
+            "required": [
+                "email",
+                "firstName",
+                "lastName",
+                "password"
+            ],
+            "properties": {
+                "email": {
+                    "type": "string"
+                },
+                "firstName": {
+                    "type": "string"
+                },
+                "lastName": {
+                    "type": "string"
+                },
+                "password": {
+                    "type": "string"
+                }
+            }
+        },
+        "UserUpdateParamsDto": {
+            "type": "object",
+            "required": [
+                "id"
+            ],
+            "properties": {
+                "firstName": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "lastName": {
+                    "type": "string"
                 }
             }
         }
     },
     "securityDefinitions": {
         "JWTAuth": {
-            "description": "Bearer JWT authorization guard",
+            "description": "JWT authorization guard",
             "type": "apiKey",
             "name": "Authorization",
             "in": "header"

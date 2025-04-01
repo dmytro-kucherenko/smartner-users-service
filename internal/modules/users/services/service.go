@@ -25,13 +25,13 @@ func New(repository *repositories.Main) *Main {
 	}
 }
 
-func (service *Main) Get(ctx context.Context, filters dtos.GetRequest) (user dtos.ItemResponse, err error) {
+func (service *Main) Get(ctx context.Context, filters dtos.GetParams) (user dtos.Item, err error) {
 	item, err := service.repository.FindOne(ctx, repositories.FindOneParams{
 		ID: types.OptionalValue(filters.ID),
 	})
 
 	if err != nil {
-		err = errors.NewHttpError(http.StatusNotFound, "User was not found.")
+		err = errors.NewHttpError(http.StatusNotFound, "user was not found.")
 
 		return
 	}
@@ -41,13 +41,13 @@ func (service *Main) Get(ctx context.Context, filters dtos.GetRequest) (user dto
 	return
 }
 
-func (service *Main) GetPage(ctx context.Context, payload dtos.GetAllRequest) (page dtos.PageResponse, err error) {
+func (service *Main) GetPage(ctx context.Context, params dtos.GetAllParams) (page dtos.Page, err error) {
 	total, err := service.repository.Count(ctx)
 	if err != nil {
 		return
 	}
 
-	measures, err := pagination.GetPageMeasures(total, payload.PageQueryRequest)
+	measures, err := pagination.GetPageMeasures(total, params.PageParams)
 	if err != nil {
 		return
 	}
@@ -57,7 +57,7 @@ func (service *Main) GetPage(ctx context.Context, payload dtos.GetAllRequest) (p
 		return
 	}
 
-	page = dtos.PageResponse{
+	page = dtos.Page{
 		Items: transform(items...),
 		Meta:  pagination.GetPageMeta(total, measures),
 	}
@@ -65,24 +65,24 @@ func (service *Main) GetPage(ctx context.Context, payload dtos.GetAllRequest) (p
 	return
 }
 
-func (service *Main) SignIn(ctx context.Context, payload dtos.SignInRequest) (user dtos.ItemResponse, err error) {
+func (service *Main) SignIn(ctx context.Context, params dtos.SignInParams) (user dtos.Item, err error) {
 	item, err := service.repository.FindOne(ctx, repositories.FindOneParams{
-		Email: types.OptionalValue(payload.Email),
+		Email: types.OptionalValue(params.Email),
 	})
 
 	if err != nil {
-		err = errors.NewHttpError(http.StatusUnauthorized, "User was not found.")
+		err = errors.NewHttpError(http.StatusUnauthorized, "user was not found.")
 
 		return
 	}
 
-	ok := service.encryptService.Verify(payload.Password, encrypt.Value{
+	ok := service.encryptService.Verify(params.Password, encrypt.Value{
 		Hash: item.PasswordHash,
 		Salt: item.PasswordSalt,
 	})
 
 	if !ok {
-		err = errors.NewHttpError(http.StatusUnauthorized, "User password is not correct.")
+		err = errors.NewHttpError(http.StatusUnauthorized, "user password is not correct.")
 
 		return
 	}
@@ -92,26 +92,26 @@ func (service *Main) SignIn(ctx context.Context, payload dtos.SignInRequest) (us
 	return
 }
 
-func (service *Main) SignUp(ctx context.Context, payload dtos.SignUpRequest) (user dtos.ItemResponse, err error) {
+func (service *Main) SignUp(ctx context.Context, params dtos.SignUpParams) (user dtos.Item, err error) {
 	_, err = service.repository.FindOne(ctx, repositories.FindOneParams{
-		Email: types.OptionalValue(payload.Email),
+		Email: types.OptionalValue(params.Email),
 	})
 
 	if err == nil {
-		err = errors.NewHttpError(http.StatusConflict, "User with this email already exists.")
+		err = errors.NewHttpError(http.StatusConflict, "user with this email already exists.")
 
 		return
 	}
 
-	password, err := service.encryptService.Gen(payload.Password)
+	password, err := service.encryptService.Gen(params.Password)
 	if err != nil {
 		return
 	}
 
 	item, err := service.repository.Create(ctx, repositories.CreateParams{
-		FirstName:    payload.FirstName,
-		LastName:     payload.LastName,
-		Email:        payload.Email,
+		FirstName:    params.FirstName,
+		LastName:     params.LastName,
+		Email:        params.Email,
 		PasswordHash: password.Hash,
 		PasswordSalt: password.Salt,
 	})
@@ -126,15 +126,15 @@ func (service *Main) SignUp(ctx context.Context, payload dtos.SignUpRequest) (us
 }
 
 // Separate route to update password with previous one
-func (service *Main) Update(ctx context.Context, filters dtos.GetRequest, payload dtos.UpdateRequest) (user dtos.ItemResponse, err error) {
-	user, err = service.Get(ctx, filters)
+func (service *Main) Update(ctx context.Context, params dtos.UpdateParams) (user dtos.Item, err error) {
+	user, err = service.Get(ctx, dtos.GetParams{ID: params.ID})
 	if err != nil {
 		return
 	}
 
-	item, err := service.repository.Update(ctx, filters.ID, &repositories.UpdateParams{
-		FirstName: types.OptionalPointer(payload.FirstName),
-		LastName:  types.OptionalPointer(payload.LastName),
+	item, err := service.repository.Update(ctx, params.ID, &repositories.UpdateParams{
+		FirstName: types.OptionalPointer(params.FirstName),
+		LastName:  types.OptionalPointer(params.LastName),
 	})
 
 	if err != nil {
@@ -146,7 +146,7 @@ func (service *Main) Update(ctx context.Context, filters dtos.GetRequest, payloa
 	return
 }
 
-func (service *Main) Delete(ctx context.Context, filters dtos.GetRequest) (user dtos.ItemResponse, err error) {
+func (service *Main) Delete(ctx context.Context, filters dtos.GetParams) (user dtos.Item, err error) {
 	_, err = service.Get(ctx, filters)
 	if err != nil {
 		return
@@ -162,11 +162,11 @@ func (service *Main) Delete(ctx context.Context, filters dtos.GetRequest) (user 
 	return
 }
 
-func transform(items ...repositories.ItemQuery) []dtos.ItemResponse {
-	users := make([]dtos.ItemResponse, 0, len(items))
+func transform(items ...repositories.ItemQuery) []dtos.Item {
+	users := make([]dtos.Item, 0, len(items))
 
 	for _, item := range items {
-		users = append(users, dtos.ItemResponse{
+		users = append(users, dtos.Item{
 			ID:        item.ID,
 			FirstName: item.FirstName,
 			LastName:  item.LastName,

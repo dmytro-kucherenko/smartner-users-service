@@ -1,4 +1,3 @@
-basePath: /api/v1
 definitions:
   ErrorDto:
     properties:
@@ -11,7 +10,7 @@ definitions:
       status:
         type: integer
     type: object
-  PaginationMetaDto:
+  PageMetaDTO:
     properties:
       next:
         type: integer
@@ -26,64 +25,64 @@ definitions:
     type: object
   UserItemDto:
     properties:
-      firstname:
+      firstName:
         type: string
       id:
         type: string
-      secondname:
+      lastName:
         type: string
     type: object
-  UserSignInBodyDto:
-    properties:
-      email:
-        type: string
-      password:
-        type: string
-    required:
-    - email
-    - password
-    type: object
-  UserSignUpBodyDto:
-    properties:
-      email:
-        type: string
-      firstname:
-        type: string
-      lastname:
-        type: string
-      password:
-        type: string
-    required:
-    - email
-    - firstname
-    - lastname
-    - password
-    type: object
-  UserUpdateBodyDto:
-    properties:
-      firstname:
-        type: string
-      lastname:
-        type: string
-    type: object
-  UsersPageDto:
+  UserPageDto:
     properties:
       items:
         items:
           $ref: '#/definitions/UserItemDto'
         type: array
       meta:
-        $ref: '#/definitions/PaginationMetaDto'
+        $ref: '#/definitions/PageMetaDTO'
     type: object
-host: localhost:8000
+  UserSignInParamsDto:
+    properties:
+      email:
+        type: string
+      password:
+        type: string
+    required:
+    - email
+    - password
+    type: object
+  UserSignUpParamsDto:
+    properties:
+      email:
+        type: string
+      firstName:
+        type: string
+      lastName:
+        type: string
+      password:
+        type: string
+    required:
+    - email
+    - firstName
+    - lastName
+    - password
+    type: object
+  UserUpdateParamsDto:
+    properties:
+      firstName:
+        type: string
+      id:
+        type: string
+      lastName:
+        type: string
+    required:
+    - id
+    type: object
 info:
   contact: {}
-  description: This is a users service example.
   license:
     name: Apache 2.0
     url: http://www.apache.org/licenses/LICENSE-2.0.html
-  title: Users API
-  version: "1.0"
 paths:
   /users/delete/:id:
     delete:
@@ -142,6 +141,8 @@ paths:
           description: Not Found
           schema:
             $ref: '#/definitions/ErrorDto'
+      security:
+      - JWTAuth: []
       summary: Get user
       tags:
       - Users
@@ -164,11 +165,13 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/UsersPageDto'
+            $ref: '#/definitions/UserPageDto'
         "400":
           description: Bad Request
           schema:
             $ref: '#/definitions/ErrorDto'
+      security:
+      - JWTAuth: []
       summary: Get users page
       tags:
       - Users
@@ -182,7 +185,7 @@ paths:
         name: body
         required: true
         schema:
-          $ref: '#/definitions/UserSignInBodyDto'
+          $ref: '#/definitions/UserSignInParamsDto'
       produces:
       - application/json
       responses:
@@ -215,7 +218,7 @@ paths:
         name: body
         required: true
         schema:
-          $ref: '#/definitions/UserSignUpBodyDto'
+          $ref: '#/definitions/UserSignUpParamsDto'
       produces:
       - application/json
       responses:
@@ -235,6 +238,8 @@ paths:
           description: Conflict
           schema:
             $ref: '#/definitions/ErrorDto'
+      security:
+      - JWTAuth: []
       summary: Sign up user
       tags:
       - Users
@@ -248,7 +253,7 @@ paths:
         name: body
         required: true
         schema:
-          $ref: '#/definitions/UserUpdateBodyDto'
+          $ref: '#/definitions/UserUpdateParamsDto'
       produces:
       - application/json
       responses:
@@ -275,7 +280,7 @@ paths:
       - Users
 securityDefinitions:
   JWTAuth:
-    description: Bearer JWT authorization guard
+    description: JWT authorization guard
     in: header
     name: Authorization
     type: apiKey

@@ -3,32 +3,20 @@
 
 build:
 	@echo "Building..."
-	@go build -o bin/main cmd/lambda/main.go
-
-build-local:
-	@echo "Building..."
-	@go build -o bin/local cmd/local/main.go
-
-build-UsersServiceFunction:
-	@GOOS=linux GOARCH=amd64 CGO_ENABLED=0 go build -o bin/bootstrap cmd/lambda/main.go
-	@cp ./bin/bootstrap $(ARTIFACTS_DIR)/.
+	@go build -o bin/api cmd/api/main.go
 
 clean:
 	@echo "Cleaning"
-	@rm -f bin/main
-	@rm -f bin/local
+	@rm -f bin/api
 
 start:
-	@bin/local
+	@bin/api
 
 run:
-	@go run cmd/local/main.go
-
-config:
-	@go run cmd/config/main.go
+	@go run cmd/api/main.go
 
 watch:
-	@air -c local.air.toml
+	@air -c api.air.toml
 
 lint:
 	@go vet ./...
@@ -36,7 +24,7 @@ lint:
 docs:
 	@go mod vendor
 	@touch docs/swagger.json
-	@go tool github.com/swaggo/swag/cmd/swag init -o docs -d cmd/local,internal,vendor/github.com/dmytro-kucherenko/smartner-utils-package
+	@go tool github.com/swaggo/swag/cmd/swag init -o docs -d cmd/api,internal,vendor/github.com/dmytro-kucherenko/smartner-utils-package
 	@go tool github.com/swaggo/swag/cmd/swag fmt
 
 pre-commit:
@@ -74,7 +62,7 @@ migration-version:
 
 deploy-service:
 	@sam build -t cfn/service.cfn.yaml
-	@sam deploy --config-file service.sam.toml
+	@sam deploy --config-file service.sam.toml --parameter-overrides ContainerImage=269733607457.dkr.ecr.eu-central-1.amazonaws.com/users-service:latest
 
 deploy-config:
 	@sam build -t cfn/service.cfn.yaml
@@ -86,7 +74,7 @@ deploy-db:
 
 deploy-project:
 	@sam build -t cfn/project.cfn.yaml
-	@sam deploy --config-file project.sam.toml --capabilities CAPABILITY_NAMED_IAM
+	@sam deploy --config-file project.sam.toml
 
 lint-deploy:
 	@sam validate -t cfn/service.cfn.yaml --lint

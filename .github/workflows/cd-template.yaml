@@ -59,33 +59,33 @@ jobs:
             --capabilities CAPABILITY_IAM \
             --no-fail-on-empty-changeset
 
-      - name: Deploy config stack
-        env:
-          AWS_REGION: ${{ vars.AWS_REGION }}
-          AWS_CONFIG_STACK_NAME: ${{ vars.AWS_CONFIG_STACK_NAME }}
-          AWS_CONFIG_FUNCTION_NAME: ${{ vars.AWS_CONFIG_FUNCTION_NAME }}
-        run: |
-          sam build -t cfn/service.cfn.yaml
-          sam deploy \
-            --stack-name $AWS_CONFIG_STACK_NAME \
-            --resolve-s3 \
-            --s3-prefix $AWS_CONFIG_STACK_NAME \
-            --region $AWS_REGION \
-            --capabilities CAPABILITY_IAM \
-            --parameter-overrides FunctionName=$AWS_CONFIG_FUNCTION_NAME OnlyConfig=1 \
-            --no-fail-on-empty-changeset
+      # - name: Deploy config stack
+      #   env:
+      #     AWS_REGION: ${{ vars.AWS_REGION }}
+      #     AWS_CONFIG_STACK_NAME: ${{ vars.AWS_CONFIG_STACK_NAME }}
+      #     AWS_CONFIG_FUNCTION_NAME: ${{ vars.AWS_CONFIG_FUNCTION_NAME }}
+      #   run: |
+      #     sam build -t cfn/service.cfn.yaml
+      #     sam deploy \
+      #       --stack-name $AWS_CONFIG_STACK_NAME \
+      #       --resolve-s3 \
+      #       --s3-prefix $AWS_CONFIG_STACK_NAME \
+      #       --region $AWS_REGION \
+      #       --capabilities CAPABILITY_IAM \
+      #       --parameter-overrides FunctionName=$AWS_CONFIG_FUNCTION_NAME OnlyConfig=1 \
+      #       --no-fail-on-empty-changeset
 
-      - name: Invoke config
-        env:
-          AWS_CONFIG_FUNCTION_NAME: ${{ vars.AWS_CONFIG_FUNCTION_NAME }}
-        run: |
-          response=$(sam remote invoke $AWS_CONFIG_FUNCTION_NAME --output text)
-          if [[ "$response" == *'"statusCode":500'* ]]; then
-            echo "Config invocation failed: $response"
-            exit 1
-          else
-            echo "Config invocation succeeded: $response"
-          fi
+      # - name: Invoke config
+      #   env:
+      #     AWS_CONFIG_FUNCTION_NAME: ${{ vars.AWS_CONFIG_FUNCTION_NAME }}
+      #   run: |
+      #     response=$(sam remote invoke $AWS_CONFIG_FUNCTION_NAME --output text)
+      #     if [[ "$response" == *'"statusCode":500'* ]]; then
+      #       echo "Config invocation failed: $response"
+      #       exit 1
+      #     else
+      #       echo "Config invocation succeeded: $response"
+      #     fi
 
       - name: Build docs
         run: make docs
@@ -95,16 +95,16 @@ jobs:
         with:
           project-name: UsersBuildProject
 
-      - name: Deploy service stack
-        env:
-          AWS_REGION: ${{ vars.AWS_REGION }}
-          AWS_SERVICE_STACK_NAME: ${{ vars.AWS_SERVICE_STACK_NAME }}
-        run: |
-          sam build -t cfn/service.cfn.yaml
-          sam deploy \
-            --stack-name $AWS_SERVICE_STACK_NAME \
-            --resolve-s3 \
-            --s3-prefix $AWS_SERVICE_STACK_NAME \
-            --region $AWS_REGION \
-            --capabilities CAPABILITY_IAM \
-            --no-fail-on-empty-changeset
+      # - name: Deploy service stack
+      #   env:
+      #     AWS_REGION: ${{ vars.AWS_REGION }}
+      #     AWS_SERVICE_STACK_NAME: ${{ vars.AWS_SERVICE_STACK_NAME }}
+      #   run: |
+      #     sam build -t cfn/service.cfn.yaml
+      #     sam deploy \
+      #       --stack-name $AWS_SERVICE_STACK_NAME \
+      #       --resolve-s3 \
+      #       --s3-prefix $AWS_SERVICE_STACK_NAME \
+      #       --region $AWS_REGION \
+      #       --capabilities CAPABILITY_IAM \
+      #       --no-fail-on-empty-changeset

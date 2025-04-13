@@ -1,5 +1,7 @@
 # Smartner Users Service
 
+## Content:
+
 ### Includes:
 
 - Domain and models

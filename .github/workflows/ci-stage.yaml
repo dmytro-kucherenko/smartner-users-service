@@ -1,9 +1,9 @@
-name: Stage Pull Request Actions
+name: CI Stage
 
 on:
   pull_request:
     branches:
-      - 'stage'
+      - stage
 
 permissions:
   id-token: write

@@ -2,73 +2,271 @@ AWSTemplateFormatVersion: '2010-09-09'
 Transform: AWS::Serverless-2016-10-31
 
 Parameters:
-  FunctionName:
+  ServiceName:
     Type: String
-    Default: UsersServiceFunction
+    Description: Name of the gRPC service
+    Default: UsersService
 
-  OnlyConfig:
+  ContainerImage:
+    Type: String
+    Description: Docker image URI for the gRPC service container
+
+  ContainerPort:
     Type: Number
-    AllowedValues:
-      - 0
-      - 1
+    Description: Port the gRPC container listens on
+    Default: 8000
+
+  TaskCpu:
+    Type: Number
+    Description: CPU units for the Fargate task (1024 = 1 vCPU)
+    Default: 256
+    AllowedValues: [256, 512, 1024, 2048, 4096]
+
+  TaskMemory:
+    Type: Number
+    Description: Memory for the Fargate task in MiB
+    Default: 512
+    AllowedValues: [512, 1024, 2048, 3072, 4096, 5120, 6144, 7168, 8192]
+
+  DesiredCount:
+    Type: Number
+    Description: Initial number of task instances
+    Default: 1
+    MinValue: 1
+
+  MinCapacity:
+    Type: Number
+    Description: Minimum task instances for auto-scaling
     Default: 0
-
-  FunctionCodeURI:
-    Type: String
-    Default: ../.
-
-  FunctionHandler:
-    Type: String
-    Default: bootstrap
-
-  FunctionRuntime:
-    Type: String
-    Default: provided.al2
-
-  FunctionTimeout:
-    Type: Number
     MinValue: 0
-    Default: 10
 
-  DBSchema:
+  MaxCapacity:
+    Type: Number
+    Description: Maximum task instances for auto-scaling
+    Default: 10
+    MinValue: 1
+
+  CPUTargetValue:
+    Type: Number
+    Description: Target value of the CPU scaling
+    Default: 70.0
+
+  CPUScaleInCooldown:
+    Type: Number
+    Description: Scale-in cooldown of the CPU scaling
+    Default: 60
+
+  CPUScaleOutCooldown:
+    Type: Number
+    Description: Scale-out cooldown of the CPU scaling
+    Default: 60
+
+  MemoryTargetValue:
+    Type: Number
+    Description: Target value of the CPU scaling
+    Default: 70.0
+
+  MemoryScaleInCooldown:
+    Type: Number
+    Description: Scale-in cooldown of the CPU scaling
+    Default: 60
+
+  MemoryScaleOutCooldown:
+    Type: Number
+    Description: Scale-out cooldown of the CPU scaling
+    Default: 60
+
+  ServiceProtocol:
     Type: String
-    Default: users
+    Description: Service communication protocol
+    Default: TCP
+
+  ServicePlatformVersion:
+    Type: String
+    Description: Service platform version
+    Default: '1.4.0'
+
+  TargetDeregistrationDelay:
+    Type: String
+    Description: Service tasks target deregistration delay
+    Default: '30'
+
+  HealthCheckIntervalSeconds:
+    Type: Number
+    Description: Frequency interval of health checks
+    Default: 30
+
+  HealthCheckGracePeriodSeconds:
+    Type: Number
+    Description: Time allowed for service initialization
+    Default: 180
+
+  HealthyThresholdCount:
+    Type: Number
+    Description: Minimum amount of task successful health checks
+    Default: 2
+
+  UnhealthyThresholdCount:
+    Type: Number
+    Description: Maximum amount of task failed health checks
+    Default: 2
+
+  DeploymentMaximumPercent:
+    Type: Number
+    Description: Percentage of tasks that can run during deployment
+    Default: 200
+
+  DeploymentMinimumHealthyPercent:
+    Type: Number
+    Description: Percentage of healthy tasks that should run during deployment
+    Default: 100
 
 Resources:
-  UsersServiceFunction:
-    Type: AWS::Serverless::Function
+  UsersTaskRole:
+    Type: AWS::IAM::Role
     Properties:
-      FunctionName: !Ref FunctionName
-      CodeUri: !Ref FunctionCodeURI
-      Handler: !Ref FunctionHandler
-      Runtime: !Ref FunctionRuntime
-      Timeout: !Ref FunctionTimeout
-      VpcConfig:
-        SubnetIds:
-          - !ImportValue PrivateSubnetAID
-          - !ImportValue PrivateSubnetBID
-        SecurityGroupIds:
-          - !ImportValue DBSecurityGroupID
-      Environment:
-        Variables:
-          APP_ENV: !Sub "{{resolve:ssm:/app/env}}"
-          APP_PROTOCOL: https
-          APP_HOST: !ImportValue ApiHost
-          APP_BASE_PATH: !ImportValue ApiVersion
-          APP_ONLY_CONFIG: !Ref OnlyConfig
-          CLIENT_URL: !Sub "{{resolve:ssm:/client/url}}"
-          DB_HOST: !ImportValue UsersDBInstanceHost
-          DB_PORT: !ImportValue UsersDBInstancePort
-          DB_NAME: !Sub "{{resolve:secretsmanager:/db:SecretString:name:AWSCURRENT}}"
-          DB_USERNAME: !Sub "{{resolve:secretsmanager:/db:SecretString:username:AWSCURRENT}}"
-          DB_PASSWORD: !Sub "{{resolve:secretsmanager:/db:SecretString:password:AWSCURRENT}}"
-          DB_SCHEMA: !Ref DBSchema
-          PASSWORD_SECRET: !Sub "{{resolve:secretsmanager:/auth:SecretString:passwordSecret:AWSCURRENT}}"
-          PASSWORD_ROUNDS: !Sub "{{resolve:secretsmanager:/auth:SecretString:passwordRounds:AWSCURRENT}}"
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: ecs-tasks.amazonaws.com
+            Action: sts:AssumeRole
+      # Add any additional policies your service needs here
+      ManagedPolicyArns: []
+
+  UsersTaskDefinition:
+    Type: AWS::ECS::TaskDefinition
+    Properties:
+      Family: !Ref ServiceName
+      Cpu: !Ref TaskCpu
+      Memory: !Ref TaskMemory
+      NetworkMode: awsvpc
+      RequiresCompatibilities:
+        - FARGATE
+      ExecutionRoleArn: !ImportValue TaskExecutionRoleARN
+      TaskRoleArn: !GetAtt UsersTaskRole.Arn
+      ContainerDefinitions:
+        - Name: !Ref ServiceName
+          Image: !Ref ContainerImage
+          Essential: true
+          PortMappings:
+            - ContainerPort: !Ref ContainerPort
+              HostPort: !Ref ContainerPort
+              Protocol: !Ref ServiceProtocol
+          LogConfiguration:
+            LogDriver: awslogs
+            Options:
+              awslogs-group: !ImportValue ECSLogGroupID
+              awslogs-region: !Ref AWS::Region
+              awslogs-stream-prefix: ecs
+          Environment: # Environment variables
+            - Name: SERVICE_NAME
+              Value: !Ref ServiceName
+
+  UsersTargetGroup:
+    Type: AWS::ElasticLoadBalancingV2::TargetGroup
+    Properties:
+      TargetType: ip
+      Port: !Ref ContainerPort
+      Protocol: !Ref ServiceProtocol
+      VpcId: !ImportValue GlobalVPCID
+      HealthCheckEnabled: true
+      HealthCheckProtocol: !Ref ServiceProtocol
+      HealthCheckPort: !Ref ContainerPort
+      HealthCheckIntervalSeconds: !Ref HealthCheckIntervalSeconds
+      HealthyThresholdCount: !Ref HealthyThresholdCount
+      UnhealthyThresholdCount: !Ref UnhealthyThresholdCount
+      TargetGroupAttributes:
+        - Key: deregistration_delay.timeout_seconds
+          Value: !Ref TargetDeregistrationDelay
+
+  UsersLoadListener:
+    Type: AWS::ElasticLoadBalancingV2::Listener
+    Properties:
+      LoadBalancerArn: !ImportValue LoadBalancerID
+      Port: !Ref ContainerPort
+      Protocol: !Ref ServiceProtocol
+      DefaultActions:
+        - Type: forward
+          TargetGroupArn: !Ref UsersTargetGroup
+
+  UsersECSService:
+    Type: AWS::ECS::Service
+    DependsOn: UsersLoadListener
+    Properties:
+      ServiceName: !Ref ServiceName
+      Cluster: !ImportValue ECSClusterID
+      TaskDefinition: !Ref UsersTaskDefinition
+      LaunchType: FARGATE
+      PlatformVersion: !Ref ServicePlatformVersion
+      DesiredCount: !Ref DesiredCount
+      DeploymentConfiguration:
+        MaximumPercent: !Ref DeploymentMaximumPercent
+        MinimumHealthyPercent: !Ref DeploymentMinimumHealthyPercent
+      NetworkConfiguration:
+        AwsvpcConfiguration:
+          AssignPublicIp: ENABLED  # Can be DISABLED if using private subnets with NAT Gateway
+          Subnets:
+            - !ImportValue PrivateSubnetAID
+            - !ImportValue PrivateSubnetBID
+          SecurityGroups:
+            - !ImportValue ServiceSecurityGroupID
+      LoadBalancers:
+        - ContainerName: !Ref ServiceName
+          ContainerPort: !Ref ContainerPort
+          TargetGroupArn: !Ref UsersTargetGroup
+      HealthCheckGracePeriodSeconds: !Ref HealthCheckGracePeriodSeconds
+
+  UsersScalableTarget:
+    Type: AWS::ApplicationAutoScaling::ScalableTarget
+    Properties:
+      MinCapacity: !Ref MinCapacity
+      MaxCapacity: !Ref MaxCapacity
+      ResourceId: !Join
+        - /
+        - - service
+          - !ImportValue ECSClusterID
+          - !GetAtt UsersECSService.Name
+      ScalableDimension: ecs:service:DesiredCount
+      ServiceNamespace: ecs
+      RoleARN: !ImportValue AutoScalingRoleARN
+
+  UsersCPUScalingPolicy:
+    Type: AWS::ApplicationAutoScaling::ScalingPolicy
+    Properties:
+      PolicyName: CPUScalingPolicy
+      PolicyType: TargetTrackingScaling
+      ScalingTargetId: !Ref UsersScalableTarget
+      TargetTrackingScalingPolicyConfiguration:
+        PredefinedMetricSpecification:
+          PredefinedMetricType: ECSServiceAverageCPUUtilization
+        TargetValue: !Ref CPUTargetValue
+        ScaleInCooldown: !Ref CPUScaleInCooldown
+        ScaleOutCooldown: !Ref CPUScaleOutCooldown
+
+  UsersMemoryScalingPolicy:
+    Type: AWS::ApplicationAutoScaling::ScalingPolicy
+    Properties:
+      PolicyName: MemoryScalingPolicy
+      PolicyType: TargetTrackingScaling
+      ScalingTargetId: !Ref UsersScalableTarget
+      TargetTrackingScalingPolicyConfiguration:
+        PredefinedMetricSpecification:
+          PredefinedMetricType: ECSServiceAverageMemoryUtilization
+        TargetValue: !Ref MemoryTargetValue
+        ScaleInCooldown: !Ref MemoryScaleInCooldown
+        ScaleOutCooldown: !Ref MemoryScaleOutCooldown
 
 Outputs:
-  UsersServiceFunctionArn:
-    Description: "ARN of the Users Service Function"
-    Value: !GetAtt UsersServiceFunction.Arn
+  UsersECSServiceID:
+    Description: ECS Service Name
+    Value: !Ref UsersECSService
     Export:
-      Name: !Sub "${FunctionName}Arn"
+      Name: UsersECSServiceID
+
+  UsersECSServicePort:
+    Description: ECS Service container port
+    Value: !Ref ContainerPort
+    Export:
+      Name: UsersECSServicePort

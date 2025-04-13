@@ -1,0 +1,74 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+
+Parameters:
+  FunctionName:
+    Type: String
+    Default: UsersServiceFunction
+
+  OnlyConfig:
+    Type: Number
+    AllowedValues:
+      - 0
+      - 1
+    Default: 0
+
+  FunctionCodeURI:
+    Type: String
+    Default: ../.
+
+  FunctionHandler:
+    Type: String
+    Default: bootstrap
+
+  FunctionRuntime:
+    Type: String
+    Default: provided.al2
+
+  FunctionTimeout:
+    Type: Number
+    MinValue: 0
+    Default: 10
+
+  DBSchema:
+    Type: String
+    Default: users
+
+Resources:
+  UsersServiceFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: !Ref FunctionName
+      CodeUri: !Ref FunctionCodeURI
+      Handler: !Ref FunctionHandler
+      Runtime: !Ref FunctionRuntime
+      Timeout: !Ref FunctionTimeout
+      VpcConfig:
+        SubnetIds:
+          - !ImportValue PrivateSubnetAID
+          - !ImportValue PrivateSubnetBID
+        SecurityGroupIds:
+          - !ImportValue DBSecurityGroupID
+      Environment:
+        Variables:
+          APP_ENV: !Sub "{{resolve:ssm:/app/env}}"
+          APP_PROTOCOL: https
+          APP_HOST: !ImportValue ApiHost
+          APP_BASE_PATH: !ImportValue ApiVersion
+          APP_ONLY_CONFIG: !Ref OnlyConfig
+          CLIENT_URL: !Sub "{{resolve:ssm:/client/url}}"
+          DB_HOST: !ImportValue UsersDBInstanceHost
+          DB_PORT: !ImportValue UsersDBInstancePort
+          DB_NAME: !Sub "{{resolve:secretsmanager:/db:SecretString:name:AWSCURRENT}}"
+          DB_USERNAME: !Sub "{{resolve:secretsmanager:/db:SecretString:username:AWSCURRENT}}"
+          DB_PASSWORD: !Sub "{{resolve:secretsmanager:/db:SecretString:password:AWSCURRENT}}"
+          DB_SCHEMA: !Ref DBSchema
+          PASSWORD_SECRET: !Sub "{{resolve:secretsmanager:/auth:SecretString:passwordSecret:AWSCURRENT}}"
+          PASSWORD_ROUNDS: !Sub "{{resolve:secretsmanager:/auth:SecretString:passwordRounds:AWSCURRENT}}"
+
+Outputs:
+  UsersServiceFunctionArn:
+    Description: "ARN of the Users Service Function"
+    Value: !GetAtt UsersServiceFunction.Arn
+    Export:
+      Name: !Sub "${FunctionName}Arn"

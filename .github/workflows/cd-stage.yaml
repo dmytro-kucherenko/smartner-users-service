@@ -1,9 +1,9 @@
-name: Stage Merge Actions
+name: CD Stage
 
 on:
   push:
     branches:
-      - 'stage'
+      - stage
 
 permissions:
   id-token: write

@@ -1,20 +1,28 @@
 package internal
 
 import (
+	"net/http"
 	"time"
 
-	"github.com/Dmytro-Kucherenko/smartner-users-service/docs"
-	"github.com/Dmytro-Kucherenko/smartner-users-service/internal/common/config"
-	"github.com/Dmytro-Kucherenko/smartner-users-service/internal/modules"
-	"github.com/dmytro-kucherenko/smartner-utils-package/pkg/log/types"
+	"github.com/dmytro-kucherenko/smartner-users-service/docs"
+	"github.com/dmytro-kucherenko/smartner-users-service/internal/common/config"
+	"github.com/dmytro-kucherenko/smartner-users-service/internal/modules"
+	"github.com/dmytro-kucherenko/smartner-utils-package/pkg/log"
 	schema "github.com/dmytro-kucherenko/smartner-utils-package/pkg/schema/adapters/playground"
 	"github.com/dmytro-kucherenko/smartner-utils-package/pkg/server"
-	adapter "github.com/dmytro-kucherenko/smartner-utils-package/pkg/server/adapters/gin"
+	adapterGin "github.com/dmytro-kucherenko/smartner-utils-package/pkg/server/adapters/gin"
+	adapterGRPC "github.com/dmytro-kucherenko/smartner-utils-package/pkg/server/adapters/grpc"
+	"github.com/dmytro-kucherenko/smartner-utils-package/pkg/server/adapters/grpc/interceptors"
+	"github.com/dmytro-kucherenko/smartner-utils-package/pkg/server/multiplexer"
+	"google.golang.org/grpc"
+	"google.golang.org/grpc/credentials/insecure"
 )
 
+// Make default or so, log grpc interceptor
+// Layered Architecture: repos, services, apis
+// Remove parsers, make  manual mappers inside api/repo
 const (
-	ShutdownTimeout time.Duration = 10 * time.Second
-	DBTimeout       time.Duration = 1 * time.Second
+	dbTimeout time.Duration = 1 * time.Second
 )
 
 func addDocs() {
@@ -30,51 +38,74 @@ func addDocs() {
 	docs.SwaggerInfo.Schemes = []string{protocol}
 }
 
-func Init(logger types.Logger, meta server.RequestMeta) (options adapter.StartupOptions, err error) {
+func New() (app *modules.App, err error) {
 	err = config.Load()
 	if err != nil {
 		return
 	}
 
+	err = schema.Init()
+	if err != nil {
+		return
+	}
+
 	connection := config.DBConnection()
-	db, err := server.ConnectSQL(connection, DBTimeout)
+	db, err := server.ConnectSQL(connection, dbTimeout)
 	if err != nil {
 		return
 	}
 
-	validator, err := schema.NewParamsValidator()
+	UserConnection := "localhost:8000" // from config
+	userConn, err := grpc.NewClient(UserConnection, grpc.WithTransportCredentials(insecure.NewCredentials()))
 	if err != nil {
 		return
 	}
 
-	meta.Validator = validator
-	onlyConfig := config.AppOnlyConfig()
+	return modules.NewApp(db, userConn), nil
+}
 
-	if onlyConfig {
-		return adapter.StartupOptions{
-			Router: nil,
-			StartupOptions: server.StartupOptions{
-				Server:          nil,
-				ShutdownTimeout: ShutdownTimeout,
-				OnlyConfig:      onlyConfig,
-			},
-		}, nil
-	}
-
-	port := config.AppPort()
+func InitREST(app *modules.App) *http.Server {
+	logger := log.New("init-rest")
 	clientURL := config.ClientURL()
 	isProd := config.IsProd()
 
 	addDocs()
-	router, httpServer := adapter.CreateRouter(port, isProd, clientURL)
-	api := adapter.CreateRoutes(router, "/users", logger)
-	modules.Init(api, db, meta)
+	router, server := adapterGin.CreateRouter(isProd, clientURL)
+	api := adapterGin.CreateRoutes(router, "/user", logger)
+	adapterGin.InitModules(api, app)
 
-	return adapter.StartupOptions{
-		Router: router,
-		StartupOptions: server.StartupOptions{
-			Server:          httpServer,
-			ShutdownTimeout: ShutdownTimeout,
-		},
-	}, nil
+	return server
+}
+
+func InitGRPC(app *modules.App) *grpc.Server {
+	config := adapterGRPC.GetConfig(app)
+	server := grpc.NewServer(grpc.ChainUnaryInterceptor(
+		interceptors.OptionsUnary(),
+		interceptors.ConfigUnary(config),
+		interceptors.ValidateUnary()),
+	)
+
+	adapterGRPC.InitModules(server, app)
+
+	return server
+}
+
+func Init() error {
+	app, err := New()
+	if err != nil {
+		return err
+	}
+
+	port := config.AppPort()
+	service, err := multiplexer.NewService(port)
+	if err != nil {
+		return err
+	}
+
+	err = service.WithGRPC(InitGRPC(app)).WithHTTP(InitREST(app)).Serve()
+	if err != nil {
+		return err
+	}
+
+	return nil
 }

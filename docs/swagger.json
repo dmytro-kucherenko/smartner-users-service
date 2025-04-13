@@ -1,12 +1,7 @@
 {
     "swagger": "2.0",
     "info": {
-        "contact": {},
-        "license": {
-            "name": "Apache 2.0",
-            "url": "http://www.apache.org/licenses/LICENSE-2.0.html"
-        },
-        "version": "1.0"
+        "contact": {}
     },
     "paths": {
         "/users/delete/:id": {
@@ -263,53 +258,6 @@
                 }
             }
         },
-        "/users/test": {
-            "get": {
-                "security": [
-                    {
-                        "JWTAuth": []
-                    }
-                ],
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "Users"
-                ],
-                "summary": "Get users page",
-                "parameters": [
-                    {
-                        "minimum": 1,
-                        "type": "integer",
-                        "name": "page",
-                        "in": "query"
-                    },
-                    {
-                        "minimum": 1,
-                        "type": "integer",
-                        "name": "size",
-                        "in": "query"
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/UserPageDto"
-                        }
-                    },
-                    "400": {
-                        "description": "Bad Request",
-                        "schema": {
-                            "$ref": "#/definitions/ErrorDto"
-                        }
-                    }
-                }
-            }
-        },
         "/users/update/:id": {
             "put": {
                 "security": [
@@ -487,14 +435,6 @@
                     "type": "string"
                 }
             }
-        }
-    },
-    "securityDefinitions": {
-        "JWTAuth": {
-            "description": "JWT authorization guard",
-            "type": "apiKey",
-            "name": "Authorization",
-            "in": "Cookie"
         }
     }
 }

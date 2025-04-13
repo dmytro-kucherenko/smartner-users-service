@@ -1,8 +1,7 @@
 package main
 
 import (
-	"github.com/Dmytro-Kucherenko/smartner-users-service/internal"
-	startup "github.com/dmytro-kucherenko/smartner-utils-package/pkg/server/adapters/gin/startups/lambda"
+	"github.com/dmytro-kucherenko/smartner-users-service/internal"
 )
 
 // @version					1.0
@@ -13,5 +12,8 @@ import (
 // @name						Authorization
 // @description				JWT authorization guard
 func main() {
-	startup.Init(internal.Init)
+	err := internal.Init()
+	if err != nil {
+		panic(err.Error())
+	}
 }

@@ -3,12 +3,21 @@ package modules
 import (
 	"database/sql"
 
-	"github.com/Dmytro-Kucherenko/smartner-users-service/internal/modules/users"
+	"github.com/dmytro-kucherenko/smartner-users-service/internal/modules/user"
 	"github.com/dmytro-kucherenko/smartner-utils-package/pkg/server"
-	"github.com/gin-gonic/gin"
+	"google.golang.org/grpc"
 )
 
-func Init(api *gin.RouterGroup, db *sql.DB, meta server.RequestMeta) {
-	usersModule := users.NewModule(db)
-	usersModule.Init(api, meta)
+type App struct {
+	userModule *user.Module
+}
+
+func NewApp(db *sql.DB, userConn *grpc.ClientConn) *App {
+	userModule := user.NewModule(db, userConn)
+
+	return &App{userModule}
+}
+
+func (app *App) Modules() []server.Module {
+	return []server.Module{app.userModule}
 }

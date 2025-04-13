@@ -80,10 +80,6 @@ definitions:
     type: object
 info:
   contact: {}
-  license:
-    name: Apache 2.0
-    url: http://www.apache.org/licenses/LICENSE-2.0.html
-  version: "1.0"
 paths:
   /users/delete/:id:
     delete:
@@ -244,35 +240,6 @@ paths:
       summary: Sign up user
       tags:
       - Users
-  /users/test:
-    get:
-      consumes:
-      - application/json
-      parameters:
-      - in: query
-        minimum: 1
-        name: page
-        type: integer
-      - in: query
-        minimum: 1
-        name: size
-        type: integer
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/UserPageDto'
-        "400":
-          description: Bad Request
-          schema:
-            $ref: '#/definitions/ErrorDto'
-      security:
-      - JWTAuth: []
-      summary: Get users page
-      tags:
-      - Users
   /users/update/:id:
     put:
       consumes:
@@ -308,10 +275,4 @@ paths:
       summary: Update user
       tags:
       - Users
-securityDefinitions:
-  JWTAuth:
-    description: JWT authorization guard
-    in: Cookie
-    name: Authorization
-    type: apiKey
 swagger: "2.0"

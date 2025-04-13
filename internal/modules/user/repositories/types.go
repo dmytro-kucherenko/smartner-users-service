@@ -1,7 +1,7 @@
 package repositories
 
 import (
-	db "github.com/Dmytro-Kucherenko/smartner-users-service/internal/gen/db/users"
+	db "github.com/dmytro-kucherenko/smartner-users-service/internal/gen/db/user"
 	"github.com/dmytro-kucherenko/smartner-utils-package/pkg/pagination"
 	"github.com/dmytro-kucherenko/smartner-utils-package/pkg/types"
 )

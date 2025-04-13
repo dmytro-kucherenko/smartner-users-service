@@ -4,9 +4,10 @@ import (
 	"context"
 	"net/http"
 
-	"github.com/Dmytro-Kucherenko/smartner-users-service/internal/common/config"
-	"github.com/Dmytro-Kucherenko/smartner-users-service/internal/modules/users/dtos"
-	"github.com/Dmytro-Kucherenko/smartner-users-service/internal/modules/users/repositories"
+	"github.com/dmytro-kucherenko/smartner-contracts-package/pkg/modules/user"
+	"github.com/dmytro-kucherenko/smartner-users-service/internal/common/config"
+	"github.com/dmytro-kucherenko/smartner-users-service/internal/modules/user/dtos"
+	"github.com/dmytro-kucherenko/smartner-users-service/internal/modules/user/repositories"
 	"github.com/dmytro-kucherenko/smartner-utils-package/pkg/encrypt"
 	"github.com/dmytro-kucherenko/smartner-utils-package/pkg/pagination"
 	"github.com/dmytro-kucherenko/smartner-utils-package/pkg/server/errors"
@@ -16,16 +17,18 @@ import (
 type Main struct {
 	repository     *repositories.Main
 	encryptService *encrypt.Service
+	userClient     *user.Client
 }
 
-func New(repository *repositories.Main) *Main {
+func New(repository *repositories.Main, userClient *user.Client) *Main {
 	return &Main{
 		repository:     repository,
 		encryptService: encrypt.NewService(config.PasswordSecret(), config.PasswordRounds()),
+		userClient:     userClient,
 	}
 }
 
-func (service *Main) Get(ctx context.Context, filters dtos.GetParams) (user dtos.Item, err error) {
+func (service *Main) Get(ctx context.Context, filters dtos.GetParamsDTO) (user dtos.Item, err error) {
 	item, err := service.repository.FindOne(ctx, repositories.FindOneParams{
 		ID: types.OptionalValue(filters.ID),
 	})
@@ -127,7 +130,7 @@ func (service *Main) SignUp(ctx context.Context, params dtos.SignUpParams) (user
 
 // Separate route to update password with previous one
 func (service *Main) Update(ctx context.Context, params dtos.UpdateParams) (user dtos.Item, err error) {
-	user, err = service.Get(ctx, dtos.GetParams{ID: params.ID})
+	user, err = service.Get(ctx, dtos.GetParamsDTO{ID: params.ID})
 	if err != nil {
 		return
 	}
@@ -146,7 +149,7 @@ func (service *Main) Update(ctx context.Context, params dtos.UpdateParams) (user
 	return
 }
 
-func (service *Main) Delete(ctx context.Context, filters dtos.GetParams) (user dtos.Item, err error) {
+func (service *Main) Delete(ctx context.Context, filters dtos.GetParamsDTO) (user dtos.Item, err error) {
 	_, err = service.Get(ctx, filters)
 	if err != nil {
 		return

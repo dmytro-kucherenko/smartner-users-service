@@ -5,7 +5,7 @@ import (
 	"github.com/dmytro-kucherenko/smartner-utils-package/pkg/types"
 )
 
-type GetParams struct {
+type GetParamsDTO struct {
 	ID types.ID `uri:"id" validate:"required,uuid4" swaggertype:"string"`
 } // @name UserGetParamsDto
 

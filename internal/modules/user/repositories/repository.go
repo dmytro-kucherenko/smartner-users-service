@@ -4,7 +4,7 @@ import (
 	"context"
 	"database/sql"
 
-	db "github.com/Dmytro-Kucherenko/smartner-users-service/internal/gen/db/users"
+	db "github.com/dmytro-kucherenko/smartner-users-service/internal/gen/db/user"
 	"github.com/dmytro-kucherenko/smartner-utils-package/pkg/queries"
 	"github.com/dmytro-kucherenko/smartner-utils-package/pkg/types"
 	"github.com/google/uuid"
